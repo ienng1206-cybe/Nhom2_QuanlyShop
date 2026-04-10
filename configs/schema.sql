@@ -1,63 +1,127 @@
-CREATE DATABASE IF NOT EXISTS nhom2_quanlyshop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS nhom2_quanlyshop 
+CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE nhom2_quanlyshop;
 
+-- USERS
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('client', 'admin') NOT NULL DEFAULT 'client',
-    created_at DATETIME NULL
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- CATEGORIES
 CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    created_at DATETIME NULL
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- PRODUCTS
 CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     category_id INT NOT NULL,
     name VARCHAR(150) NOT NULL,
-    description TEXT NULL,
+    description TEXT,
     price DECIMAL(12,2) NOT NULL DEFAULT 0,
     stock INT NOT NULL DEFAULT 0,
-    image VARCHAR(255) NULL,
-    created_at DATETIME NULL,
-    CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+    image VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
+-- CARTS (Giỏ hàng)
+CREATE TABLE IF NOT EXISTS carts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- CART ITEMS
+CREATE TABLE IF NOT EXISTS cart_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cart_id INT,
+    product_id INT,
+    quantity INT DEFAULT 1,
+    FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+-- ORDERS
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     total_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
-    status ENUM('pending', 'processing', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
-    created_at DATETIME NULL,
-    CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    status ENUM('pending', 'processing', 'completed', 'cancelled') DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- ORDER ITEMS
 CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
     product_id INT NOT NULL,
     price DECIMAL(12,2) NOT NULL,
     quantity INT NOT NULL,
-    CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    CONSTRAINT fk_order_items_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
+-- PAYMENTS (Thanh toán)
+CREATE TABLE IF NOT EXISTS payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    method VARCHAR(50),
+    status VARCHAR(50),
+    paid_at DATETIME,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+);
+
+-- SHIPPING (Vận chuyển)
+CREATE TABLE IF NOT EXISTS shipping (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    address TEXT,
+    phone VARCHAR(20),
+    status VARCHAR(50),
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+);
+
+-- REVIEWS
 CREATE TABLE IF NOT EXISTS reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    product_id INT NOT NULL,
-    rating INT NOT NULL DEFAULT 5,
-    comment TEXT NULL,
-    created_at DATETIME NULL,
-    CONSTRAINT fk_reviews_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_reviews_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    user_id INT,
+    product_id INT,
+    rating INT DEFAULT 5,
+    comment TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
-INSERT INTO users(name, email, password, role, created_at)
-VALUES ('Admin', 'admin@gmail.com', '$2y$10$2vYUfmjcpyr6N5vQ6XrWw.Fw20e1nDx3fNy6UwUE.AmQx4G6RoCGq', 'admin', NOW())
+-- WISHLIST (Yêu thích)
+CREATE TABLE IF NOT EXISTS wishlist (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    product_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+-- USER SESSIONS (Đăng nhập)
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    token VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- ADMIN ACCOUNT
+INSERT INTO users(name, email, password, role)
+VALUES ('Admin', 'admin@gmail.com', '$2y$10$2vYUfmjcpyr6N5vQ6XrWw.Fw20e1nDx3fNy6UwUE.AmQx4G6RoCGq', 'admin')
 ON DUPLICATE KEY UPDATE email = email;

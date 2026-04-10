@@ -1,8 +1,9 @@
 <div class="col-12">
     <?php if (empty($items)): ?>
-        <p>Giỏ hàng chưa có sản phẩm.</p>
+        <p class="empty-hint mb-0">Giỏ hàng chưa có sản phẩm. <a href="<?= BASE_URL ?>?action=product/index">Xem sản phẩm</a></p>
     <?php else: ?>
-        <table class="table table-bordered">
+        <div class="app-table-wrap mb-3">
+        <table class="table table-bordered mb-0">
             <thead>
                 <tr>
                     <th>Sản phẩm</th>
@@ -28,7 +29,8 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
-        <p class="fw-bold">Tổng tiền: <?= number_format((float) $total) ?> VND</p>
+        </div>
+        <p class="fw-bold fs-5">Tổng tiền: <?= number_format((float) $total) ?> đ</p>
         <a class="btn btn-success" href="<?= BASE_URL ?>?action=order/checkout">Đặt hàng / Thanh toán</a>
     <?php endif; ?>
 </div>

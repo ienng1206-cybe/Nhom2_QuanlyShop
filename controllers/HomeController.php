@@ -9,6 +9,7 @@ class HomeController extends BaseController
 
         $this->render('home/index', [
             'title' => 'Trang chủ',
+            'hide_page_title' => true,
             'view' => 'home/index',
             'products' => $products,
         ]);

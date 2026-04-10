@@ -1,5 +1,10 @@
-<div class="col-md-8">
-    <h3><?= htmlspecialchars($product['name']) ?></h3>
+<div class="col-lg-8">
+    <?php if (!empty($product['image'])): ?>
+        <div class="mb-4 rounded overflow-hidden shadow" style="max-height:320px;">
+            <img class="w-100 h-100 object-fit-cover" src="<?= htmlspecialchars($product['image']) ?>" alt="" style="max-height:320px;object-fit:cover;">
+        </div>
+    <?php endif; ?>
+    <h3 class="fw-bold"><?= htmlspecialchars($product['name']) ?></h3>
     <p class="text-muted">Danh mục: <?= htmlspecialchars($product['category_name'] ?? 'Chưa phân loại') ?></p>
     <p><?= nl2br(htmlspecialchars($product['description'] ?? '')) ?></p>
     <p class="fw-bold">Giá: <?= number_format((float) $product['price']) ?> VND</p>
@@ -39,7 +44,7 @@
     <?php endif; ?>
 
     <?php foreach ($reviews as $review): ?>
-        <div class="border p-2 rounded mb-2">
+        <div class="review-item border p-2 rounded mb-2">
             <strong><?= htmlspecialchars($review['user_name']) ?></strong> - <?= (int) $review['rating'] ?>/5
             <div><?= htmlspecialchars($review['comment']) ?></div>
         </div>

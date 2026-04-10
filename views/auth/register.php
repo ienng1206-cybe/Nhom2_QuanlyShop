@@ -1,4 +1,5 @@
-<div class="col-md-6">
+<div class="col-md-8 col-lg-5 mx-auto">
+    <div class="auth-card">
     <form method="post" action="<?= BASE_URL ?>?action=auth/register">
         <div class="mb-3">
             <label class="form-label">Họ tên</label>
@@ -12,6 +13,7 @@
             <label class="form-label">Mật khẩu</label>
             <input type="password" class="form-control" name="password" required>
         </div>
-        <button class="btn btn-success">Đăng ký</button>
+        <button class="btn btn-success w-100">Đăng ký</button>
     </form>
+    </div>
 </div>

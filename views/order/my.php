@@ -1,5 +1,6 @@
 <div class="col-12">
-    <table class="table table-striped table-bordered">
+    <div class="app-table-wrap">
+    <table class="table table-striped table-bordered mb-0">
         <thead>
             <tr>
                 <th>#</th>
@@ -19,4 +20,5 @@
             <?php endforeach; ?>
         </tbody>
     </table>
+    </div>
 </div>
