@@ -15,8 +15,11 @@
 <?php foreach ($products as $product): ?>
     <div class="col-md-6 col-lg-4">
         <div class="card h-100">
-            <?php if (!empty($product['image'])): ?>
-                <img class="card-img-top object-fit-cover" src="<?= htmlspecialchars($product['image']) ?>" alt="" style="height:160px;">
+            <?php
+            $listImg = product_image_url($product['image'] ?? '');
+            ?>
+            <?php if ($listImg !== ''): ?>
+                <img class="card-img-top object-fit-cover" src="<?= htmlspecialchars($listImg) ?>" alt="" style="height:160px;">
             <?php else: ?>
                 <div class="product-thumb">Ảnh sản phẩm</div>
             <?php endif; ?>
@@ -24,7 +27,10 @@
                 <h5 class="card-title"><?= htmlspecialchars($product['name']) ?></h5>
                 <p class="text-muted mb-1 small"><?= htmlspecialchars($product['category_name'] ?? 'Chưa phân loại') ?></p>
                 <p class="fw-bold text-primary mb-2 mt-auto"><?= number_format((float) $product['price']) ?> đ</p>
-                <a class="btn btn-outline-primary btn-sm align-self-start" href="<?= BASE_URL ?>?action=product/detail&id=<?= $product['id'] ?>">Xem chi tiết</a>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <a class="btn btn-outline-primary btn-sm" href="<?= BASE_URL ?>?action=product/detail&id=<?= $product['id'] ?>">Xem chi tiết</a>
+                </div>
+                <?php require PATH_VIEW . 'partials/cart_quick_add.php'; ?>
             </div>
         </div>
     </div>

@@ -61,3 +61,30 @@ if (!function_exists('require_admin')) {
         }
     }
 }
+
+if (!function_exists('product_image_url')) {
+    function product_image_url(?string $image): string
+    {
+        if ($image === null || $image === '') {
+            return '';
+        }
+        if (preg_match('#^https?://#i', $image)) {
+            return $image;
+        }
+
+        return BASE_ASSETS_UPLOADS . ltrim($image, '/');
+    }
+}
+
+if (!function_exists('order_status_label')) {
+    function order_status_label(string $status): string
+    {
+        return match ($status) {
+            'pending' => 'Chờ xử lý',
+            'processing' => 'Đang xử lý',
+            'completed' => 'Hoàn thành',
+            'cancelled' => 'Đã hủy',
+            default => $status,
+        };
+    }
+}

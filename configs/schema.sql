@@ -32,11 +32,12 @@ CREATE TABLE IF NOT EXISTS products (
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
--- CARTS (Giỏ hàng)
+-- CARTS (Giỏ hàng — mỗi user một giỏ)
 CREATE TABLE IF NOT EXISTS carts (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
+    user_id INT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_carts_user (user_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -121,7 +122,6 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- ADMIN ACCOUNT
-INSERT INTO users(name, email, password, role)
-VALUES ('Admin', 'admin@gmail.com', '$2y$10$2vYUfmjcpyr6N5vQ6XrWw.Fw20e1nDx3fNy6UwUE.AmQx4G6RoCGq', 'admin')
+
+VALUES ('Admin', 'admin@gmail.com', '$2y$10$JBd7GPfjSGa8wroIgNG4t.8sHL3D96E8b4HyDvC3799H96BhtmzeW', 'admin')
 ON DUPLICATE KEY UPDATE email = email;

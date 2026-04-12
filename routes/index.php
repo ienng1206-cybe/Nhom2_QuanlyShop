@@ -13,9 +13,13 @@ match ($action) {
 
     'cart/index' => (new CartController())->index(),
     'cart/add' => (new CartController())->add(),
+    'cart/update' => (new CartController())->update(),
     'cart/remove' => (new CartController())->remove(),
+    'cart/clear' => (new CartController())->clear(),
 
     'order/checkout' => (new OrderController())->checkout(),
+    'order/place' => (new OrderController())->place(),
+    'order/detail' => (new OrderController())->detail(),
     'order/my' => (new OrderController())->myOrders(),
 
     'review/store' => (new ReviewController())->store(),

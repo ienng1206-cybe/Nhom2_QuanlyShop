@@ -10,6 +10,18 @@ class BaseModel
         $this->pdo = db_connect();
     }
 
+    /** CSDL cũ có thể chưa có cột products.image — tránh lỗi SQL 1054 */
+    protected function productsHasImageColumn(): bool
+    {
+        static $has = null;
+        if ($has === null) {
+            $stmt = $this->pdo->query("SHOW COLUMNS FROM `products` LIKE 'image'");
+            $has = (bool) $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+
+        return $has;
+    }
+
     public function all($orderBy = 'id DESC')
     {
         $stmt = $this->pdo->query("SELECT * FROM {$this->table} ORDER BY {$orderBy}");

@@ -333,3 +333,171 @@
     border-radius: var(--app-radius);
     border: 1px dashed var(--app-border);
 }
+
+/* —— Trang admin —— */
+.admin-page {
+    max-width: 1200px;
+    margin-inline: auto;
+}
+
+.admin-hero {
+    background: linear-gradient(125deg, #1e293b 0%, #334155 40%, #0f172a 100%);
+    color: #fff;
+    border-radius: var(--app-radius);
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.25);
+}
+
+.admin-hero-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.85;
+}
+
+.admin-hero-title {
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.admin-hero-lead {
+    font-size: 0.95rem;
+    opacity: 0.88;
+    max-width: 36rem;
+}
+
+.admin-hero-btn {
+    font-weight: 600;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+}
+
+.admin-stat-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-sm);
+    padding: 1rem 1.15rem;
+    box-shadow: var(--app-shadow);
+    height: 100%;
+    border-left: 4px solid var(--stat-accent, #64748b);
+}
+
+.admin-stat-value {
+    display: block;
+    font-size: 1.65rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: #0f172a;
+}
+
+.admin-stat-label {
+    font-size: 0.8rem;
+    color: var(--app-muted);
+    font-weight: 600;
+}
+
+.admin-stat-card--users {
+    --stat-accent: #6366f1;
+}
+
+.admin-stat-card--categories {
+    --stat-accent: #8b5cf6;
+}
+
+.admin-stat-card--products {
+    --stat-accent: #0ea5e9;
+}
+
+.admin-stat-card--orders {
+    --stat-accent: #f59e0b;
+}
+
+.admin-stat-card--reviews {
+    --stat-accent: #10b981;
+}
+
+.admin-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    padding: 1.35rem 1.5rem;
+    box-shadow: var(--app-shadow);
+}
+
+.admin-card-header {
+    margin-bottom: 1.25rem;
+}
+
+.admin-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.admin-card-desc {
+    font-size: 0.875rem;
+    color: var(--app-muted);
+    margin: 0.35rem 0 0;
+}
+
+.admin-form .form-label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #334155;
+}
+
+.admin-form .form-control,
+.admin-form .form-select {
+    border-radius: 10px;
+}
+
+.admin-divider {
+    border-color: var(--app-border);
+    opacity: 1;
+}
+
+.admin-mini-list .list-group-item {
+    border-color: var(--app-border) !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+.admin-table-scroll {
+    max-height: min(55vh, 480px);
+    overflow: auto;
+}
+
+.admin-badge-status {
+    font-weight: 600;
+    padding: 0.4em 0.65em;
+    border-radius: 8px;
+}
+
+.admin-badge-status--pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.admin-badge-status--processing {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.admin-badge-status--completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.admin-badge-status--cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.admin-page .app-table-wrap {
+    margin-bottom: 0;
+}

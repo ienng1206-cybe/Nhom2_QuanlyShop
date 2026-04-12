@@ -7,7 +7,7 @@ class AdminController extends BaseController
         require_admin();
 
         $this->render('admin/dashboard', [
-            'title' => 'Admin Dashboard',
+            'title' => 'Quản trị cửa hàng',
             'view' => 'admin/dashboard',
             'users' => (new UserModel())->all(),
             'categories' => (new CategoryModel())->all(),
