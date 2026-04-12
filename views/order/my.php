@@ -17,7 +17,7 @@
                 <?php foreach ($orders as $order): ?>
                     <tr>
                         <td>#<?= (int) $order['id'] ?></td>
-                        <td><?= number_format((float) $order['total_amount']) ?> đ</td>
+                            <td><?= number_format(order_total_amount($order)) ?> đ</td>
                         <td>
                             <span class="badge rounded-pill bg-light text-dark border"><?= htmlspecialchars(order_status_label($order['status'])) ?></span>
                         </td>

@@ -1,4 +1,9 @@
 <div class="col-12 admin-page">
+    <?php if (!empty($admin_reviews_missing)): ?>
+        <div class="alert alert-warning border-0 shadow-sm mb-4" role="alert">
+            Chưa có bảng <code>reviews</code> (hoặc lỗi truy vấn). Trong phpMyAdmin hãy chạy file <code>configs/migrate_reviews_table.sql</code> để tạo bảng — phần đánh giá sản phẩm mới hoạt động.
+        </div>
+    <?php endif; ?>
     <div class="admin-hero mb-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
             <div>
@@ -104,7 +109,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Link ảnh <span class="text-muted fw-normal">(tùy chọn)</span></label>
-                        <input class="form-control" type="text" name="image" placeholder="https://... hoặc đường dẫn file upload">
+                        <input class="form-control" type="text" name="image" placeholder="https://... ">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Mô tả</label>
@@ -138,11 +143,11 @@
                     </thead>
                     <tbody>
                         <?php foreach ($orders as $o): ?>
-                            <?php $rawSt = $o['status']; ?>
+                            <?php $rawSt = $o['status'] ?? ''; ?>
                             <tr>
                                 <td class="fw-semibold"><?= (int) $o['id'] ?></td>
-                                <td><?= (int) $o['user_id'] ?></td>
-                                <td><?= number_format((float) $o['total_amount']) ?> đ</td>
+                                <td><?= (int) ($o['user_id'] ?? 0) ?></td>
+                                <td><?= number_format(order_total_amount($o)) ?> đ</td>
                                 <td>
                                     <?php $badgeClass = preg_replace('/[^a-z]/', '', (string) $rawSt); ?>
                                     <span class="badge admin-badge-status admin-badge-status--<?= htmlspecialchars($badgeClass) ?>"><?= htmlspecialchars(order_status_label($rawSt)) ?></span>

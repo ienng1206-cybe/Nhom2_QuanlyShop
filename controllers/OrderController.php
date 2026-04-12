@@ -57,7 +57,11 @@ class OrderController extends BaseController
             $_SESSION['error'] = 'Không đủ hàng trong kho cho một hoặc nhiều sản phẩm. Vui lòng kiểm tra lại giỏ hàng.';
             redirect('cart/index');
         } catch (Throwable $e) {
-            $_SESSION['error'] = 'Không thể tạo đơn hàng. Vui lòng thử lại.';
+            $msg = $e->getMessage();
+            if (strlen($msg) > 200) {
+                $msg = substr($msg, 0, 200) . '…';
+            }
+            $_SESSION['error'] = 'Không thể tạo đơn hàng. ' . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8');
             redirect('order/checkout');
         }
     }

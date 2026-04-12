@@ -12,11 +12,13 @@ CREATE TABLE IF NOT EXISTS users (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- CATEGORIES
+-- CATEGORIES (code = mã ngắn hiển thị khi chọn danh mục, tùy chọn)
 CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    code VARCHAR(40) NULL DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_categories_code (code)
 );
 
 -- PRODUCTS
@@ -122,6 +124,7 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-
+-- ADMIN (đăng nhập web: admin@gmail.com / mật khẩu: admin123)
+INSERT INTO users(name, email, password, role)
 VALUES ('Admin', 'admin@gmail.com', '$2y$10$JBd7GPfjSGa8wroIgNG4t.8sHL3D96E8b4HyDvC3799H96BhtmzeW', 'admin')
 ON DUPLICATE KEY UPDATE email = email;

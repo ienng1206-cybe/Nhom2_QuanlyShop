@@ -76,6 +76,36 @@ if (!function_exists('product_image_url')) {
     }
 }
 
+if (!function_exists('category_option_label')) {
+    /** Nhãn trong select danh mục: [mã hoặc #id] + tên */
+    function category_option_label(array $c): string
+    {
+        $name = (string) ($c['name'] ?? '');
+        $id = (int) ($c['id'] ?? 0);
+        $code = isset($c['code']) ? trim((string) $c['code']) : '';
+        $prefix = $code !== '' ? '[' . $code . ']' : '[#' . $id . ']';
+
+        return $prefix . ' ' . $name;
+    }
+}
+
+if (!function_exists('order_total_amount')) {
+    /**
+     * Tổng tiền đơn hàng (một số CSDL dùng cột `total` thay cho `total_amount`).
+     */
+    function order_total_amount(array $order): float
+    {
+        if (isset($order['total_amount'])) {
+            return (float) $order['total_amount'];
+        }
+        if (isset($order['total'])) {
+            return (float) $order['total'];
+        }
+
+        return 0.0;
+    }
+}
+
 if (!function_exists('order_status_label')) {
     function order_status_label(string $status): string
     {

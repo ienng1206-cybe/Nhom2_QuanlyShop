@@ -46,7 +46,7 @@
         </table>
     </div>
 
-    <p class="fw-bold fs-4 text-end">Tổng thanh toán: <?= number_format((float) $order['total_amount']) ?> đ</p>
+    <p class="fw-bold fs-4 text-end">Tổng thanh toán: <?= number_format(order_total_amount($order)) ?> đ</p>
 
     <a class="btn btn-outline-primary" href="<?= BASE_URL ?>?action=order/my">← Danh sách đơn hàng</a>
 </div>

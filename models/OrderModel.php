@@ -4,6 +4,39 @@ class OrderModel extends BaseModel
 {
     protected $table = 'orders';
 
+    private static ?bool $hasShippingTable = null;
+
+    private static ?string $ordersAmountColumn = null;
+
+    private function hasShippingTable(): bool
+    {
+        if (self::$hasShippingTable === null) {
+            $r = $this->pdo->query("SHOW TABLES LIKE 'shipping'");
+            self::$hasShippingTable = (bool) $r->fetch(PDO::FETCH_NUM);
+        }
+
+        return self::$hasShippingTable;
+    }
+
+    /** Cột lưu tổng tiền: total_amount (chuẩn) hoặc total (CSDL cũ). */
+    private function ordersAmountColumn(): string
+    {
+        if (self::$ordersAmountColumn !== null) {
+            return self::$ordersAmountColumn;
+        }
+        foreach (['total_amount', 'total'] as $col) {
+            $st = $this->pdo->query('SHOW COLUMNS FROM `orders` LIKE ' . $this->pdo->quote($col));
+            if ($st && $st->fetch()) {
+                self::$ordersAmountColumn = $col;
+
+                return $col;
+            }
+        }
+        self::$ordersAmountColumn = 'total_amount';
+
+        return self::$ordersAmountColumn;
+    }
+
     /**
      * @param list<array{id:int,qty:int,price:mixed}> $cartItems
      * @param array{phone?:string,address?:string}    $shipping
@@ -34,13 +67,14 @@ class OrderModel extends BaseModel
                 $total += (float) $item['price'] * (int) $item['qty'];
             }
 
+            $amountCol = $this->ordersAmountColumn();
             $stmtOrder = $this->pdo->prepare(
-                'INSERT INTO orders(user_id, total_amount, status, created_at)
-                VALUES (:user_id, :total, "pending", NOW())'
+                "INSERT INTO orders(user_id, {$amountCol}, status, created_at)
+                VALUES (:user_id, :total_amt, 'pending', NOW())"
             );
             $stmtOrder->execute([
                 'user_id' => $userId,
-                'total' => $total,
+                'total_amt' => $total,
             ]);
             $orderId = (int) $this->pdo->lastInsertId();
 
@@ -68,7 +102,7 @@ class OrderModel extends BaseModel
                 }
             }
 
-            if (!empty($shipping['phone']) || !empty($shipping['address'])) {
+            if ($this->hasShippingTable() && (!empty($shipping['phone']) || !empty($shipping['address']))) {
                 $stmtShip = $this->pdo->prepare(
                     'INSERT INTO shipping (order_id, address, phone, status) VALUES (:order_id, :address, :phone, :status)'
                 );
@@ -114,6 +148,9 @@ class OrderModel extends BaseModel
 
     public function getShipping(int $orderId)
     {
+        if (!$this->hasShippingTable()) {
+            return null;
+        }
         $stmt = $this->pdo->prepare('SELECT * FROM shipping WHERE order_id = :oid ORDER BY id DESC LIMIT 1');
         $stmt->execute(['oid' => $orderId]);
         $row = $stmt->fetch();
@@ -132,5 +169,38 @@ class OrderModel extends BaseModel
     {
         $stmt = $this->pdo->prepare('UPDATE orders SET status = :status WHERE id = :id');
         return $stmt->execute(['status' => $status, 'id' => $id]);
+    }
+
+    /**
+     * Xóa đơn: hoàn lại tồn kho theo order_items rồi xóa đơn (CASCADE xóa chi tiết, shipping…).
+     */
+    public function delete($id): bool
+    {
+        $id = (int) $id;
+        if ($id <= 0) {
+            return false;
+        }
+
+        $this->pdo->beginTransaction();
+        try {
+            $stmt = $this->pdo->prepare('SELECT product_id, quantity FROM order_items WHERE order_id = :oid');
+            $stmt->execute(['oid' => $id]);
+            $lines = $stmt->fetchAll();
+            $upd = $this->pdo->prepare('UPDATE products SET stock = stock + :q WHERE id = :pid');
+            foreach ($lines as $row) {
+                $upd->execute([
+                    'q' => (int) $row['quantity'],
+                    'pid' => (int) $row['product_id'],
+                ]);
+            }
+
+            $ok = $this->pdo->prepare('DELETE FROM orders WHERE id = :id')->execute(['id' => $id]);
+            $this->pdo->commit();
+
+            return (bool) $ok;
+        } catch (Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
     }
 }
