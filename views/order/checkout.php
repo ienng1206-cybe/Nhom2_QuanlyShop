@@ -3,10 +3,11 @@ $total = 0;
 foreach ($items as $i) {
     $total += (float) $i['price'] * (int) $i['qty'];
 }
+$paymentMethods = PaymentModel::getPaymentMethods();
 ?>
 <div class="col-lg-7">
     <div class="auth-card" style="max-width:none;">
-        <h2 class="h5 fw-bold mb-3">Thông tin giao hàng</h2>
+        <h2 class="h5 fw-bold mb-3">Thông tin giao hàng & thanh toán</h2>
         <form method="post" action="<?= BASE_URL ?>?action=order/place">
             <div class="mb-3">
                 <label class="form-label">Họ tên</label>
@@ -20,6 +21,21 @@ foreach ($items as $i) {
                 <label class="form-label">Địa chỉ nhận hàng <span class="text-danger">*</span></label>
                 <textarea class="form-control" name="address" rows="3" required placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"></textarea>
             </div>
+            
+            <hr>
+            
+            <h3 class="h6 fw-bold mb-3">Phương thức thanh toán <span class="text-danger">*</span></h3>
+            <div class="mb-3">
+                <?php foreach ($paymentMethods as $code => $label): ?>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="method" id="method_<?= htmlspecialchars($code) ?>" value="<?= htmlspecialchars($code) ?>" <?= $code === 'COD' ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="method_<?= htmlspecialchars($code) ?>">
+                            <?= htmlspecialchars($label) ?>
+                        </label>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            
             <div class="d-flex gap-2 flex-wrap">
                 <button type="submit" class="btn btn-success">Xác nhận đặt hàng</button>
                 <a class="btn btn-outline-secondary" href="<?= BASE_URL ?>?action=cart/index">Quay lại giỏ hàng</a>
@@ -40,6 +56,6 @@ foreach ($items as $i) {
             <?php endforeach; ?>
         </ul>
         <p class="fw-bold fs-5 mt-3 mb-0 pt-2 border-top">Tổng: <?= number_format($total) ?> đ</p>
-        <p class="small text-muted mt-2 mb-0">Thanh toán khi nhận hàng (COD). Trạng thái đơn sẽ được cập nhật trong mục Đơn hàng.</p>
+        <p class="small text-muted mt-2 mb-0">Kiểm tra kỹ thông tin trước khi xác nhận đặt hàng.</p>
     </div>
 </div>

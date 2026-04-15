@@ -39,7 +39,7 @@ class OrderModel extends BaseModel
 
     /**
      * @param list<array{id:int,qty:int,price:mixed}> $cartItems
-     * @param array{phone?:string,address?:string}    $shipping
+     * @param array{phone?:string,address?:string,method?:string}    $shipping
      */
     public function createFromCart($userId, $cartItems, array $shipping = [])
     {
@@ -114,6 +114,11 @@ class OrderModel extends BaseModel
                 ]);
             }
 
+            // Tạo bản ghi thanh toán
+            $paymentMethod = trim($shipping['method'] ?? 'COD') ?: 'COD';
+            $paymentModel = new PaymentModel();
+            $paymentModel->create($orderId, $paymentMethod);
+
             $this->pdo->commit();
 
             return $orderId;
@@ -158,6 +163,21 @@ class OrderModel extends BaseModel
         return $row ?: null;
     }
 
+    /**
+     * Lấy thông tin thanh toán của đơn hàng
+     */
+    public function getPayment(int $orderId)
+    {
+        try {
+            $stmt = $this->pdo->prepare('SELECT * FROM payments WHERE order_id = :oid ORDER BY id DESC LIMIT 1');
+            $stmt->execute(['oid' => $orderId]);
+            return $stmt->fetch() ?: null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+
+
     public function getByUser($userId)
     {
         $stmt = $this->pdo->prepare('SELECT * FROM orders WHERE user_id = :user_id ORDER BY id DESC');
@@ -192,6 +212,13 @@ class OrderModel extends BaseModel
                     'q' => (int) $row['quantity'],
                     'pid' => (int) $row['product_id'],
                 ]);
+            }
+
+            // Xóa thanh toán
+            try {
+                $this->pdo->prepare('DELETE FROM payments WHERE order_id = :id')->execute(['id' => $id]);
+            } catch (PDOException $e) {
+                // Bảng payments có thể không tồn tại, bỏ qua
             }
 
             $ok = $this->pdo->prepare('DELETE FROM orders WHERE id = :id')->execute(['id' => $id]);

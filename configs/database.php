@@ -16,7 +16,7 @@ function db_connect(): PDO
         DB_HOST,
         DB_PORT,
         DB_NAME,
-        DB_CHARSET
+        'utf8mb4'
     );
 
     try {

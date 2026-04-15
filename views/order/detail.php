@@ -21,6 +21,17 @@
         </div>
     <?php endif; ?>
 
+    <?php if (!empty($payment)): ?>
+        <div class="search-panel mb-4">
+            <h3 class="h6 fw-bold mb-3">Thanh toán</h3>
+            <p class="mb-1"><strong>Phương thức:</strong> <?= htmlspecialchars(payment_method_label($payment['method'])) ?></p>
+            <p class="mb-0"><strong>Trạng thái:</strong> <span class="badge bg-<?= $payment['status'] === 'completed' ? 'success' : 'warning' ?>-subtle text-<?= $payment['status'] === 'completed' ? 'success' : 'warning' ?>"><?= htmlspecialchars(payment_status_label($payment['status'])) ?></span></p>
+            <?php if (!empty($payment['paid_at'])): ?>
+                <p class="small text-muted mt-2 mb-0">Thanh toán lúc: <?= htmlspecialchars($payment['paid_at']) ?></p>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
     <h3 class="h6 fw-bold section-title" style="margin-top:0;">Sản phẩm</h3>
     <div class="app-table-wrap mb-4">
         <table class="table mb-0 align-middle">

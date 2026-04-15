@@ -118,3 +118,28 @@ if (!function_exists('order_status_label')) {
         };
     }
 }
+
+if (!function_exists('payment_status_label')) {
+    function payment_status_label(string $status): string
+    {
+        return match ($status) {
+            'pending' => 'Chờ thanh toán',
+            'completed' => 'Đã thanh toán',
+            'failed' => 'Thanh toán thất bại',
+            'cancelled' => 'Đã hủy',
+            default => $status,
+        };
+    }
+}
+
+if (!function_exists('payment_method_label')) {
+    function payment_method_label(string $method): string
+    {
+        return match ($method) {
+            'COD' => 'Thanh toán khi nhận hàng',
+            'Banking' => 'Chuyển khoản ngân hàng',
+            'Card' => 'Thẻ tín dụng/Ghi nợ',
+            default => $method,
+        };
+    }
+}

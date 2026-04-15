@@ -30,6 +30,8 @@ class OrderController extends BaseController
 
         $phone = trim($_POST['phone'] ?? '');
         $address = trim($_POST['address'] ?? '');
+        $method = trim($_POST['method'] ?? 'COD') ?: 'COD';
+        
         if ($phone === '' || $address === '') {
             $_SESSION['error'] = 'Vui lòng nhập đầy đủ số điện thoại và địa chỉ giao hàng.';
             redirect('order/checkout');
@@ -48,6 +50,7 @@ class OrderController extends BaseController
             $orderId = $orderModel->createFromCart($userId, $items, [
                 'phone' => $phone,
                 'address' => $address,
+                'method' => $method,
             ]);
             if ($orderId) {
                 $cartModel->clear($userId);
@@ -84,6 +87,7 @@ class OrderController extends BaseController
             'order' => $order,
             'items' => $orderModel->getOrderItems($id),
             'shipping' => $orderModel->getShipping($id),
+            'payment' => $orderModel->getPayment($id),
         ]);
     }
 

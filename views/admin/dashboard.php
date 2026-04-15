@@ -153,15 +153,27 @@
                                     <span class="badge admin-badge-status admin-badge-status--<?= htmlspecialchars($badgeClass) ?>"><?= htmlspecialchars(order_status_label($rawSt)) ?></span>
                                 </td>
                                 <td>
+                                    <?php
+                                    $isLocked = in_array($rawSt, ['completed', 'cancelled'], true);
+                                    $availableTransitions = [];
+                                    if ($rawSt === 'pending') {
+                                        $availableTransitions = ['processing' => 'Đã xác nhận', 'cancelled' => 'Đã hủy'];
+                                    } elseif ($rawSt === 'processing') {
+                                        $availableTransitions = ['completed' => 'Đã thanh toán', 'cancelled' => 'Đã hủy'];
+                                    }
+                                    ?>
                                     <form method="post" action="<?= BASE_URL ?>?action=admin/order-status" class="d-flex flex-wrap gap-2 align-items-center">
                                         <input type="hidden" name="id" value="<?= (int) $o['id'] ?>">
-                                        <select name="status" class="form-select form-select-sm" style="min-width:9rem;">
-                                            <option value="pending" <?= $rawSt === 'pending' ? 'selected' : '' ?>>Chờ xử lý</option>
-                                            <option value="processing" <?= $rawSt === 'processing' ? 'selected' : '' ?>>Đang xử lý</option>
-                                            <option value="completed" <?= $rawSt === 'completed' ? 'selected' : '' ?>>Hoàn thành</option>
-                                            <option value="cancelled" <?= $rawSt === 'cancelled' ? 'selected' : '' ?>>Đã hủy</option>
+                                        <select name="status" class="form-select form-select-sm" style="min-width:9rem;" <?= $isLocked ? 'disabled' : '' ?>>
+                                            <option value="<?= $rawSt ?>" selected>→ <?= htmlspecialchars(order_status_label($rawSt)) ?></option>
+                                            <?php foreach ($availableTransitions as $status => $label): ?>
+                                                <option value="<?= htmlspecialchars($status) ?>"><?= htmlspecialchars($label) ?></option>
+                                            <?php endforeach; ?>
                                         </select>
-                                        <button class="btn btn-sm btn-primary" type="submit">Lưu</button>
+                                        <button class="btn btn-sm btn-primary" type="submit" <?= $isLocked ? 'disabled title="Trạng thái này không thể thay đổi"' : '' ?>>Lưu</button>
+                                        <?php if ($isLocked): ?>
+                                            <span class="text-muted small fw-semibold">Không thể thay đổi</span>
+                                        <?php endif; ?>
                                     </form>
                                 </td>
                                 <td class="text-end">

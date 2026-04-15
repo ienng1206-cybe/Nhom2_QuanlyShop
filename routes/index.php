@@ -22,6 +22,8 @@ match ($action) {
     'order/detail' => (new OrderController())->detail(),
     'order/my' => (new OrderController())->myOrders(),
 
+    'user/profile' => (new UserController())->profile(),
+
     'review/store' => (new ReviewController())->store(),
 
     'admin/dashboard' => (new AdminController())->dashboard(),

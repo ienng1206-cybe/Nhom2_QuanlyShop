@@ -93,11 +93,49 @@ class AdminController extends BaseController
     {
         require_admin();
         $id = (int) ($_POST['id'] ?? 0);
-        $status = $_POST['status'] ?? 'pending';
-        if ($id > 0) {
-            $ok = (new OrderModel())->updateStatus($id, $status);
-            $_SESSION[$ok ? 'success' : 'error'] = $ok ? 'Đã cập nhật trạng thái đơn hàng #' . $id . '.' : 'Không cập nhật được trạng thái.';
+        $newStatus = $_POST['status'] ?? 'pending';
+        
+        if ($id <= 0) {
+            $_SESSION['error'] = 'Mã đơn hàng không hợp lệ.';
+            redirect('admin/dashboard');
         }
+
+        // Lấy trạng thái hiện tại của đơn hàng
+        $orderModel = new OrderModel();
+        $order = $orderModel->find($id);
+        if (!$order) {
+            $_SESSION['error'] = 'Không tìm thấy đơn hàng.';
+            redirect('admin/dashboard');
+        }
+
+        $currentStatus = $order['status'] ?? 'pending';
+
+        // Kiểm tra chuyển trạng thái hợp lệ
+        $validTransitions = [
+            'pending' => ['processing', 'cancelled'],
+            'processing' => ['completed', 'cancelled'],
+            'completed' => [], // Trạng thái cuối cùng, không thay đổi được
+            'cancelled' => [], // Không thể hủy lại, không thể từ hủy -> thanh toán
+        ];
+
+        // Kiểm tra xem chuyển trạng thái có hợp lệ không
+        $allowedTransitions = $validTransitions[$currentStatus] ?? [];
+        if (!in_array($newStatus, $allowedTransitions, true)) {
+            if ($currentStatus === 'completed') {
+                $_SESSION['error'] = 'Đơn hàng đã thanh toán không thể thay đổi trạng thái.';
+            } elseif ($currentStatus === 'cancelled') {
+                $_SESSION['error'] = 'Đơn hàng đã hủy không thể thay đổi trạng thái.';
+            } else {
+                $_SESSION['error'] = 'Chuyển trạng thái không hợp lệ.';
+            }
+            redirect('admin/dashboard');
+        }
+
+        // Cập nhật trạng thái
+        $ok = $orderModel->updateStatus($id, $newStatus);
+        $_SESSION[$ok ? 'success' : 'error'] = $ok 
+            ? 'Đã cập nhật trạng thái đơn hàng #' . $id . ' thành "' . order_status_label($newStatus) . '".' 
+            : 'Không cập nhật được trạng thái.';
         redirect('admin/dashboard');
     }
 

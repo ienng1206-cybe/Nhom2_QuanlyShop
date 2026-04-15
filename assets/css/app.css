@@ -219,7 +219,26 @@
 .auth-card .btn {
     border-radius: 10px;
     font-weight: 600;
-    padding: 0.55rem 1.25rem;
+    padding: 0.65rem 1.25rem;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.auth-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.auth-card hr {
+    opacity: 0.5;
+    margin: 1.5rem 0;
+}
+
+.auth-card .form-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
 }
 
 /* Tables */

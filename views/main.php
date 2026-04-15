@@ -51,6 +51,7 @@
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                     <?php if (current_user()): ?>
+                        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>?action=user/profile">Tài khoản</a></li>
                         <li class="nav-item"><span class="nav-link navbar-text mb-0 py-lg-2">Xin chào, <?= htmlspecialchars(current_user()['name']) ?></span></li>
                         <li class="nav-item"><a class="nav-link text-danger" href="<?= BASE_URL ?>?action=auth/logout">Đăng xuất</a></li>
                     <?php else: ?>
