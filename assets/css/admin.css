@@ -375,3 +375,139 @@
 }
 
 /* Mobile: sidebar hidden — topbar đủ */
+
+/* Extra polish */
+.admin-topbar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4), transparent);
+}
+
+.admin-main::before {
+    content: "";
+    position: fixed;
+    top: 72px;
+    right: -90px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.18), transparent 70%);
+    pointer-events: none;
+}
+
+.admin-brand-mark,
+.admin-stat-card,
+.admin-card,
+.admin-side-link,
+.admin-main .btn,
+.admin-table-wrap {
+    transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.admin-brand:hover .admin-brand-mark {
+    transform: rotate(-5deg) scale(1.04);
+    box-shadow: 0 8px 18px rgba(14, 165, 233, 0.28);
+}
+
+.admin-side-link:hover {
+    transform: translateX(2px);
+}
+
+.admin-hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-hero::after {
+    content: "";
+    position: absolute;
+    right: -70px;
+    bottom: -85px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(125, 211, 252, 0.28), transparent 62%);
+    pointer-events: none;
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.35);
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+.admin-card {
+    box-shadow: 0 10px 26px rgba(2, 6, 23, 0.25);
+}
+
+.admin-card:hover {
+    border-color: rgba(56, 189, 248, 0.25);
+}
+
+.admin-main .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(2, 6, 23, 0.35);
+}
+
+.admin-main .btn-primary {
+    background-image: linear-gradient(135deg, #0ea5e9, #2563eb);
+    border: none;
+}
+
+.admin-main .btn-success {
+    background-image: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none;
+}
+
+.admin-main .btn-danger {
+    background-image: linear-gradient(135deg, #ef4444, #dc2626);
+    border: none;
+}
+
+.admin-main .btn-outline-danger:hover,
+.admin-main .btn-outline-light:hover,
+.admin-main .btn-outline-secondary:hover {
+    box-shadow: 0 8px 18px rgba(2, 6, 23, 0.3);
+}
+
+.admin-table-wrap {
+    backdrop-filter: blur(3px);
+}
+
+.admin-main .table tbody tr {
+    transition: background-color 0.18s ease;
+}
+
+.admin-main .table tbody tr:hover {
+    --bs-table-hover-bg: rgba(56, 189, 248, 0.08);
+}
+
+@media (max-width: 991.98px) {
+    .admin-topbar-inner {
+        padding: 0.55rem 0.75rem;
+    }
+
+    .admin-main-inner {
+        padding-left: 0.85rem !important;
+        padding-right: 0.85rem !important;
+    }
+
+    .admin-card {
+        padding: 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-brand-mark,
+    .admin-stat-card,
+    .admin-card,
+    .admin-side-link,
+    .admin-main .btn,
+    .admin-table-wrap {
+        transition: none !important;
+    }
+}

@@ -38,7 +38,7 @@
                                         echo ' <span class="badge text-bg-primary rounded-pill">' . (int) $cartQty . '</span>';
                                     }
                                 } catch (Throwable $e) {
-                                    // Tránh vỡ cả trang khi CSDL/sao chép bảng giỏ chưa đúng
+                                  
                                 }
                             }
                             ?>
@@ -89,7 +89,8 @@
 
     <footer class="app-footer border-top mt-auto">
         <div class="container py-3 text-center text-muted small">
-            Shop Giày Thể Thao
+            <div class="fw-semibold">Shop Giày Thể Thao</div>
+          
         </div>
     </footer>
 
