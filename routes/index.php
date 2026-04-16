@@ -19,6 +19,7 @@ match ($action) {
 
     'order/checkout' => (new OrderController())->checkout(),
     'order/place' => (new OrderController())->place(),
+    'order/cancel' => (new OrderController())->cancel(),
     'order/detail' => (new OrderController())->detail(),
     'order/my' => (new OrderController())->myOrders(),
 
@@ -27,6 +28,7 @@ match ($action) {
     'admin/dashboard' => (new AdminController())->dashboard(),
     'admin/categories' => (new AdminController())->categories(),
     'admin/products' => (new AdminController())->products(),
+    'admin/product-update' => (new AdminController())->updateProduct(),
     'admin/order-status' => (new AdminController())->updateOrderStatus(),
     'admin/delete' => (new AdminController())->delete(),
 

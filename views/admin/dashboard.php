@@ -121,6 +121,55 @@
         </div>
     </div>
 
+    <?php if (!empty($editingProduct)): ?>
+        <div class="admin-card mt-4">
+            <div class="admin-card-header">
+                <h3 class="admin-card-title">Sửa chi tiết sản phẩm #<?= (int) $editingProduct['id'] ?></h3>
+                <p class="admin-card-desc">Cập nhật thông tin và lưu thay đổi</p>
+            </div>
+            <form class="admin-form" method="post" action="<?= BASE_URL ?>?action=admin/product-update">
+                <input type="hidden" name="id" value="<?= (int) $editingProduct['id'] ?>">
+                <div class="mb-3">
+                    <label class="form-label">Danh mục</label>
+                    <select class="form-select" name="category_id" required>
+                        <option value="">— Chọn danh mục —</option>
+                        <?php foreach ($categories as $c): ?>
+                            <option value="<?= (int) $c['id'] ?>" <?= (int) $editingProduct['category_id'] === (int) $c['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($c['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tên sản phẩm</label>
+                    <input class="form-control" type="text" name="name" maxlength="150" required value="<?= htmlspecialchars($editingProduct['name'] ?? '') ?>">
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-sm-6">
+                        <label class="form-label">Giá (đ)</label>
+                        <input class="form-control" type="number" name="price" step="0.01" min="0" value="<?= htmlspecialchars((string) ($editingProduct['price'] ?? 0)) ?>">
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Tồn kho</label>
+                        <input class="form-control" type="number" name="stock" min="0" value="<?= htmlspecialchars((string) ($editingProduct['stock'] ?? 0)) ?>">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Link ảnh</label>
+                    <input class="form-control" type="text" name="image" value="<?= htmlspecialchars((string) ($editingProduct['image'] ?? '')) ?>">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mô tả</label>
+                    <textarea class="form-control" name="description" rows="3"><?= htmlspecialchars((string) ($editingProduct['description'] ?? '')) ?></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">Lưu thay đổi</button>
+                    <a class="btn btn-outline-secondary" href="<?= BASE_URL ?>?action=admin/dashboard">Bỏ chọn</a>
+                </div>
+            </form>
+        </div>
+    <?php endif; ?>
+
     <div class="admin-card mt-4">
         <div class="admin-card-header">
             <h3 class="admin-card-title">Đơn hàng</h3>
@@ -138,7 +187,7 @@
                             <th>Tổng tiền</th>
                             <th>Trạng thái</th>
                             <th style="min-width:220px;">Cập nhật</th>
-                            <th></th>
+                            <th style="width:160px;">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -199,7 +248,8 @@
                                 <td><?= htmlspecialchars($p['name']) ?></td>
                                 <td><?= number_format((float) $p['price']) ?> đ</td>
                                 <td><?= (int) $p['stock'] ?></td>
-                                <td class="text-end">
+                                <td class="text-end d-flex justify-content-end gap-2 flex-wrap">
+                                    <a class="btn btn-sm btn-outline-primary" href="<?= BASE_URL ?>?action=admin/dashboard&edit_product_id=<?= (int) $p['id'] ?>">Sửa</a>
                                     <a class="btn btn-sm btn-outline-danger" href="<?= BASE_URL ?>?action=admin/delete&type=product&id=<?= (int) $p['id'] ?>" onclick="return confirm('Xóa sản phẩm này?');">Xóa</a>
                                 </td>
                             </tr>

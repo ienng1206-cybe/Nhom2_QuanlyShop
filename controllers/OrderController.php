@@ -87,6 +87,31 @@ class OrderController extends BaseController
         ]);
     }
 
+    public function cancel()
+    {
+        require_login();
+        if ($this->requestMethod() !== 'POST') {
+            redirect('order/my');
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            $_SESSION['error'] = 'Mã đơn không hợp lệ.';
+            redirect('order/my');
+        }
+
+        try {
+            $ok = (new OrderModel())->cancelForUser($id, (int) current_user()['id']);
+            $_SESSION[$ok ? 'success' : 'error'] = $ok
+                ? 'Đã hủy đơn hàng #' . $id . '.'
+                : 'Không thể hủy đơn (chỉ hủy được đơn đang chờ xử lý).';
+        } catch (Throwable $e) {
+            $_SESSION['error'] = 'Không thể hủy đơn hàng lúc này.';
+        }
+
+        redirect('order/my');
+    }
+
     public function myOrders()
     {
         require_login();

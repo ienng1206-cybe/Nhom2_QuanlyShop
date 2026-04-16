@@ -32,6 +32,12 @@ class AdminController extends BaseController
             $admin_reviews_missing = true;
         }
 
+        $editProductId = (int) ($_GET['edit_product_id'] ?? 0);
+        $editingProduct = null;
+        if ($editProductId > 0) {
+            $editingProduct = (new ProductModel())->find($editProductId);
+        }
+
         $this->renderAdminPage('admin/dashboard', [
             'title' => 'Bảng điều khiển',
             'users' => $this->adminAll(UserModel::class),
@@ -40,6 +46,7 @@ class AdminController extends BaseController
             'orders' => $this->adminAll(OrderModel::class),
             'reviews' => $reviews,
             'admin_reviews_missing' => $admin_reviews_missing,
+            'editingProduct' => $editingProduct,
         ]);
     }
 
@@ -86,6 +93,35 @@ class AdminController extends BaseController
                 }
             }
         }
+        redirect('admin/dashboard');
+    }
+
+    public function updateProduct()
+    {
+        require_admin();
+        if ($this->requestMethod() !== 'POST') {
+            redirect('admin/dashboard');
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
+        $data = [
+            'category_id' => (int) ($_POST['category_id'] ?? 0),
+            'name' => trim($_POST['name'] ?? ''),
+            'description' => trim($_POST['description'] ?? ''),
+            'price' => (float) ($_POST['price'] ?? 0),
+            'stock' => (int) ($_POST['stock'] ?? 0),
+            'image' => trim($_POST['image'] ?? ''),
+        ];
+
+        try {
+            $ok = (new ProductModel())->updateById($id, $data);
+            $_SESSION[$ok ? 'success' : 'error'] = $ok
+                ? 'Đã cập nhật sản phẩm #' . $id . '.'
+                : 'Không thể cập nhật sản phẩm.';
+        } catch (Throwable $e) {
+            $_SESSION['error'] = 'Lỗi khi cập nhật sản phẩm.';
+        }
+
         redirect('admin/dashboard');
     }
 
