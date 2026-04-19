@@ -147,23 +147,70 @@ class AdminController extends BaseController
         }
 
         try {
-            match ($type) {
+            $pdo = db_connect();
+            
+            // Xóa các liên kết trước khi xóa dữ liệu chính
+            if ($type === 'order') {
+                // Xóa order_items liên kết đến đơn hàng này
+                $pdo->prepare('DELETE FROM order_items WHERE order_id = :id')->execute(['id' => $id]);
+                // Xóa shipping liên kết
+                $pdo->prepare('DELETE FROM shipping WHERE order_id = :id')->execute(['id' => $id]);
+                // Xóa payments liên kết
+                $pdo->prepare('DELETE FROM payments WHERE order_id = :id')->execute(['id' => $id]);
+            }
+            
+            if ($type === 'product') {
+                // Xóa order_items liên kết đến sản phẩm này
+                $pdo->prepare('DELETE FROM order_items WHERE product_id = :id')->execute(['id' => $id]);
+                // Xóa cart_items liên kết đến sản phẩm này
+                $pdo->prepare('DELETE FROM cart_items WHERE product_id = :id')->execute(['id' => $id]);
+                // Xóa review liên kết
+                $pdo->prepare('DELETE FROM reviews WHERE product_id = :id')->execute(['id' => $id]);
+                // Xóa wishlist liên kết
+                $pdo->prepare('DELETE FROM wishlist WHERE product_id = :id')->execute(['id' => $id]);
+            }
+            
+            // Nếu xóa danh mục, xóa tất cả sản phẩm trong danh mục trước
+            if ($type === 'category') {
+                $products = (new ProductModel())->all();
+                foreach ($products as $p) {
+                    if ((int) $p['category_id'] === $id) {
+                        $productId = (int) $p['id'];
+                        // Xóa các liên kết của sản phẩm
+                        $pdo->prepare('DELETE FROM order_items WHERE product_id = :id')->execute(['id' => $productId]);
+                        $pdo->prepare('DELETE FROM cart_items WHERE product_id = :id')->execute(['id' => $productId]);
+                        $pdo->prepare('DELETE FROM reviews WHERE product_id = :id')->execute(['id' => $productId]);
+                        $pdo->prepare('DELETE FROM wishlist WHERE product_id = :id')->execute(['id' => $productId]);
+                        // Sau đó xóa sản phẩm
+                        (new ProductModel())->delete($productId);
+                    }
+                }
+            }
+            
+            $success = match ($type) {
                 'user' => (new UserModel())->delete($id),
                 'category' => (new CategoryModel())->delete($id),
                 'product' => (new ProductModel())->delete($id),
                 'order' => (new OrderModel())->delete($id),
                 'review' => (new ReviewModel())->delete($id),
-                default => null,
+                default => false,
             };
-            if ($type === 'order') {
-                $_SESSION['success'] = 'Đã xóa đơn hàng #' . $id . ' và hoàn lại tồn kho.';
-            } elseif (in_array($type, ['user', 'category', 'product', 'review'], true)) {
-                $_SESSION['success'] = 'Đã xóa bản ghi.';
+            
+            if ($success) {
+                if ($type === 'order') {
+                    $_SESSION['success'] = 'Đã xóa đơn hàng #' . $id . ' cùng order_items, shipping, payments.';
+                } elseif ($type === 'category') {
+                    $_SESSION['success'] = 'Đã xóa danh mục cùng tất cả sản phẩm liên kết.';
+                } elseif ($type === 'product') {
+                    $_SESSION['success'] = 'Đã xóa sản phẩm cùng dữ liệu liên kết (order_items, giỏ hàng, đánh giá, yêu thích).';
+                } elseif (in_array($type, ['user', 'review'], true)) {
+                    $_SESSION['success'] = 'Đã xóa bản ghi.';
+                }
+            } else {
+                $_SESSION['error'] = 'Không xóa được. Kiểm tra xem bản ghi có được tham chiếu bởi bản ghi khác không.';
             }
         } catch (Throwable $e) {
-            $_SESSION['error'] = $type === 'order'
-                ? 'Không xóa được đơn hàng (lỗi CSDL hoặc quyền).'
-                : 'Không xóa được.';
+            $_SESSION['error'] = 'Không xóa được (lỗi CSDL: ' . $e->getMessage() . ').';
         }
 
         redirect('admin/dashboard');

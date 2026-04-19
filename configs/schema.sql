@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS=0;
+
 CREATE DATABASE IF NOT EXISTS nhom2_quanlyshop 
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE nhom2_quanlyshop;
@@ -18,7 +20,7 @@ CREATE TABLE IF NOT EXISTS categories (
     name VARCHAR(100) NOT NULL,
     code VARCHAR(40) NULL DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_categories_code (code)
+    INDEX idx_categories_code (code)
 );
 
 -- PRODUCTS
@@ -128,3 +130,5 @@ CREATE TABLE IF NOT EXISTS user_sessions (
 INSERT INTO users(name, email, password, role)
 VALUES ('Admin', 'admin@gmail.com', '$2y$10$JBd7GPfjSGa8wroIgNG4t.8sHL3D96E8b4HyDvC3799H96BhtmzeW', 'admin')
 ON DUPLICATE KEY UPDATE email = email;
+
+SET FOREIGN_KEY_CHECKS=1;
