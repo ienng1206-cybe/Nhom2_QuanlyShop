@@ -13,9 +13,14 @@ match ($action) {
 
     'cart/index' => (new CartController())->index(),
     'cart/add' => (new CartController())->add(),
+    'cart/update' => (new CartController())->update(),
     'cart/remove' => (new CartController())->remove(),
+    'cart/clear' => (new CartController())->clear(),
 
     'order/checkout' => (new OrderController())->checkout(),
+    'order/place' => (new OrderController())->place(),
+    'order/cancel' => (new OrderController())->cancel(),
+    'order/detail' => (new OrderController())->detail(),
     'order/my' => (new OrderController())->myOrders(),
 
     'review/store' => (new ReviewController())->store(),
@@ -23,6 +28,7 @@ match ($action) {
     'admin/dashboard' => (new AdminController())->dashboard(),
     'admin/categories' => (new AdminController())->categories(),
     'admin/products' => (new AdminController())->products(),
+    'admin/product-update' => (new AdminController())->updateProduct(),
     'admin/order-status' => (new AdminController())->updateOrderStatus(),
     'admin/delete' => (new AdminController())->delete(),
 

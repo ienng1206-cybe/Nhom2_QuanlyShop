@@ -11,8 +11,11 @@
 <?php foreach ($products as $product): ?>
     <div class="col-md-6 col-lg-4">
         <div class="card h-100">
-            <?php if (!empty($product['image'])): ?>
-                <img class="card-img-top object-fit-cover" src="<?= htmlspecialchars($product['image']) ?>" alt="" style="height:160px;">
+            <?php
+            $homeImg = product_image_url($product['image'] ?? '');
+            ?>
+            <?php if ($homeImg !== ''): ?>
+                <img class="card-img-top object-fit-cover" src="<?= htmlspecialchars($homeImg) ?>" alt="" style="height:160px;">
             <?php else: ?>
                 <div class="product-thumb">Ảnh sản phẩm</div>
             <?php endif; ?>
@@ -21,7 +24,10 @@
                 <p class="mb-1 text-muted small"><?= htmlspecialchars($product['category_name'] ?? 'Chưa phân loại') ?></p>
                 <p class="card-text text-muted small flex-grow-1"><?= htmlspecialchars(substr($product['description'] ?? '', 0, 120)) ?><?= strlen($product['description'] ?? '') > 120 ? '…' : '' ?></p>
                 <p class="fw-bold text-primary mb-2"><?= number_format((float) $product['price']) ?> đ</p>
-                <a class="btn btn-outline-primary btn-sm mt-auto align-self-start" href="<?= BASE_URL ?>?action=product/detail&id=<?= $product['id'] ?>">Chi tiết</a>
+                <div class="d-flex flex-wrap gap-2 mt-auto align-items-center">
+                    <a class="btn btn-outline-primary btn-sm" href="<?= BASE_URL ?>?action=product/detail&id=<?= $product['id'] ?>">Chi tiết</a>
+                </div>
+                <?php require PATH_VIEW . 'partials/cart_quick_add.php'; ?>
             </div>
         </div>
     </div>

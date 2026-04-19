@@ -28,7 +28,22 @@
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>?action=product/index">Sản phẩm</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>?action=cart/index">Giỏ hàng</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= BASE_URL ?>?action=cart/index">Giỏ hàng
+                            <?php
+                            if (current_user()) {
+                                try {
+                                    $cartQty = (new CartModel())->countItems((int) current_user()['id']);
+                                    if ($cartQty > 0) {
+                                        echo ' <span class="badge text-bg-primary rounded-pill">' . (int) $cartQty . '</span>';
+                                    }
+                                } catch (Throwable $e) {
+                                  
+                                }
+                            }
+                            ?>
+                        </a>
+                    </li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>?action=order/my">Đơn hàng</a></li>
                     <?php if (is_admin()): ?>
                         <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>?action=admin/dashboard">Quản trị</a></li>
@@ -74,7 +89,8 @@
 
     <footer class="app-footer border-top mt-auto">
         <div class="container py-3 text-center text-muted small">
-            Shop Giày Thể Thao
+            <div class="fw-semibold">Shop Giày Thể Thao</div>
+          
         </div>
     </footer>
 

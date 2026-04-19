@@ -1,7 +1,10 @@
 <div class="col-lg-8">
-    <?php if (!empty($product['image'])): ?>
+    <?php
+    $detailImg = product_image_url($product['image'] ?? '');
+    ?>
+    <?php if ($detailImg !== ''): ?>
         <div class="mb-4 rounded overflow-hidden shadow" style="max-height:320px;">
-            <img class="w-100 h-100 object-fit-cover" src="<?= htmlspecialchars($product['image']) ?>" alt="" style="max-height:320px;object-fit:cover;">
+            <img class="w-100 h-100 object-fit-cover" src="<?= htmlspecialchars($detailImg) ?>" alt="" style="max-height:320px;object-fit:cover;">
         </div>
     <?php endif; ?>
     <h3 class="fw-bold"><?= htmlspecialchars($product['name']) ?></h3>
@@ -9,15 +12,22 @@
     <p><?= nl2br(htmlspecialchars($product['description'] ?? '')) ?></p>
     <p class="fw-bold">Giá: <?= number_format((float) $product['price']) ?> VND</p>
 
-    <form method="post" action="<?= BASE_URL ?>?action=cart/add" class="row g-2 mb-4">
-        <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-        <div class="col-md-3">
-            <input type="number" class="form-control" name="qty" value="1" min="1">
-        </div>
-        <div class="col-md-4">
-            <button class="btn btn-success">Thêm vào giỏ</button>
-        </div>
-    </form>
+    <?php if (current_user()): ?>
+        <form method="post" action="<?= BASE_URL ?>?action=cart/add" class="row g-2 mb-4">
+            <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
+            <div class="col-md-3">
+                <input type="number" class="form-control" name="qty" value="1" min="1" max="<?= max(1, (int) $product['stock']) ?>" <?= (int) $product['stock'] < 1 ? 'disabled' : '' ?>>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-success" type="submit" <?= (int) $product['stock'] < 1 ? 'disabled' : '' ?>>Thêm vào giỏ</button>
+            </div>
+        </form>
+        <?php if ((int) $product['stock'] < 1): ?>
+            <p class="text-danger small mb-4">Sản phẩm hiện hết hàng.</p>
+        <?php endif; ?>
+    <?php else: ?>
+        <p class="mb-4"><a href="<?= BASE_URL ?>?action=auth/login">Đăng nhập</a> để thêm sản phẩm vào giỏ hàng.</p>
+    <?php endif; ?>
 
     <h5>Đánh giá</h5>
     <?php if (current_user()): ?>
