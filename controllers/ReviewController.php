@@ -16,4 +16,22 @@ class ReviewController extends BaseController
 
         redirect('product/detail&id=' . $productId);
     }
+
+    public function index()
+    {
+        $reviewModel = new ReviewModel();
+        $reviews = [];
+        
+        try {
+            $reviews = $reviewModel->getAllWithDetails();
+        } catch (Throwable $e) {
+            // Bảng reviews có thể chưa được tạo
+        }
+
+        $this->render('review/index', [
+            'title' => 'Đánh giá sản phẩm',
+            'view' => 'review/index',
+            'reviews' => $reviews,
+        ]);
+    }
 }

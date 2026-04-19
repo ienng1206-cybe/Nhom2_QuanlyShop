@@ -17,6 +17,19 @@ class ReviewModel extends BaseModel
         return $stmt->fetchAll();
     }
 
+    public function getAllWithDetails()
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT r.*, u.name AS user_name, p.name AS product_name, p.id AS product_id
+            FROM reviews r
+            JOIN users u ON u.id = r.user_id
+            JOIN products p ON p.id = r.product_id
+            ORDER BY r.created_at DESC'
+        );
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     public function create($userId, $productId, $rating, $comment)
     {
         $stmt = $this->pdo->prepare(

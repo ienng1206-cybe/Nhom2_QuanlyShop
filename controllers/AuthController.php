@@ -12,6 +12,12 @@ class AuthController extends BaseController
             $user = $userModel->findByEmail($email);
 
             if ($user && password_verify($password, $user['password'])) {
+                // Kiểm tra tài khoản có bị khóa không
+                if (!empty($user['is_locked'])) {
+                    $_SESSION['error'] = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.';
+                    redirect('auth/login');
+                }
+
                 $_SESSION['user'] = $user;
                 redirect(is_admin() ? 'admin/dashboard' : '/');
             }

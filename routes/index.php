@@ -24,12 +24,16 @@ match ($action) {
     'order/my' => (new OrderController())->myOrders(),
 
     'review/store' => (new ReviewController())->store(),
+    'review/index' => (new ReviewController())->index(),
 
     'admin/dashboard' => (new AdminController())->dashboard(),
     'admin/categories' => (new AdminController())->categories(),
+    'admin/category-update' => (new AdminController())->updateCategory(),
     'admin/products' => (new AdminController())->products(),
     'admin/product-update' => (new AdminController())->updateProduct(),
     'admin/order-status' => (new AdminController())->updateOrderStatus(),
+    'admin/users' => (new AdminController())->users(),
+    'admin/update-user' => (new AdminController())->updateUser(),
     'admin/delete' => (new AdminController())->delete(),
 
     default => (new HomeController())->index(),

@@ -215,4 +215,90 @@ class AdminController extends BaseController
 
         redirect('admin/dashboard');
     }
+
+    public function users()
+    {
+        require_admin();
+        $userModel = new UserModel();
+        $users = $userModel->all('id DESC');
+
+        $this->renderAdminPage('admin/users', [
+            'title' => 'Quản lý tài khoản',
+            'users' => $users,
+        ]);
+    }
+
+    public function updateUser()
+    {
+        require_admin();
+        if ($this->requestMethod() !== 'POST') {
+            redirect('admin/users');
+        }
+
+        $userId = (int) ($_POST['user_id'] ?? 0);
+        $role = $_POST['role'] ?? 'client';
+        $action = $_POST['action'] ?? '';
+
+        if ($userId <= 0) {
+            $_SESSION['error'] = 'ID người dùng không hợp lệ.';
+            redirect('admin/users');
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->find($userId);
+
+        if (!$user) {
+            $_SESSION['error'] = 'Không tìm thấy người dùng.';
+            redirect('admin/users');
+        }
+
+        try {
+            if ($action === 'update_role') {
+                if ($userModel->updateRole($userId, $role)) {
+                    $_SESSION['success'] = 'Đã cập nhật vai trò cho người dùng #' . $userId . '.';
+                } else {
+                    $_SESSION['error'] = 'Không thể cập nhật vai trò.';
+                }
+            } elseif ($action === 'toggle_lock') {
+                if ($userModel->toggleLock($userId)) {
+                    $newStatus = ($user['is_locked'] ?? 0) ? 0 : 1;
+                    $msg = $newStatus ? 'Đã khóa' : 'Đã mở khóa';
+                    $_SESSION['success'] = $msg . ' tài khoản người dùng #' . $userId . '.';
+                } else {
+                    $_SESSION['error'] = 'Không thể cập nhật trạng thái khóa.';
+                }
+            }
+        } catch (Throwable $e) {
+            $_SESSION['error'] = 'Lỗi: ' . $e->getMessage();
+        }
+
+        redirect('admin/users');
+    }
+
+    public function updateCategory()
+    {
+        require_admin();
+        if ($this->requestMethod() !== 'POST') {
+            redirect('admin/dashboard');
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
+        $name = trim($_POST['name'] ?? '');
+        $code = trim($_POST['code'] ?? '');
+
+        if ($id <= 0 || $name === '') {
+            $_SESSION['error'] = 'Dữ liệu danh mục không hợp lệ.';
+        } else {
+            try {
+                $ok = (new CategoryModel())->updateById($id, $name, $code !== '' ? $code : null);
+                $_SESSION[$ok ? 'success' : 'error'] = $ok
+                    ? 'Đã cập nhật danh mục #' . $id . '.'
+                    : 'Không thể cập nhật danh mục.';
+            } catch (Throwable $e) {
+                $_SESSION['error'] = 'Lỗi khi cập nhật danh mục.';
+            }
+        }
+
+        redirect('admin/dashboard');
+    }
 }

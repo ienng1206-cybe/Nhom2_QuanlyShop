@@ -11,7 +11,10 @@
                 <h2 class="admin-hero-title mb-0">Quản trị cửa hàng</h2>
                 <p class="admin-hero-lead mb-0 mt-2">Thêm danh mục, sản phẩm và theo dõi đơn hàng.</p>
             </div>
-            <a class="btn btn-light admin-hero-btn" href="<?= BASE_URL ?>">← Về trang bán hàng</a>
+            <div class="d-flex gap-2 flex-wrap">
+                <a class="btn btn-primary" href="<?= BASE_URL ?>?action=admin/users">👥 Quản lý tài khoản</a>
+                <a class="btn btn-light admin-hero-btn" href="<?= BASE_URL ?>">← Về trang bán hàng</a>
+            </div>
         </div>
     </div>
 
@@ -65,14 +68,21 @@
                 <?php if (!empty($categories)): ?>
                     <hr class="my-4 admin-divider">
                     <p class="small text-muted fw-semibold text-uppercase mb-2">Danh sách hiện có</p>
-                    <ul class="list-group list-group-flush admin-mini-list">
-                        <?php foreach ($categories as $c): ?>
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent border-bottom">
-                                <span><?= htmlspecialchars($c['name']) ?></span>
-                                <a class="btn btn-sm btn-outline-danger" href="<?= BASE_URL ?>?action=admin/delete&type=category&id=<?= (int) $c['id'] ?>" onclick="return confirm('Xóa danh mục này?');">Xóa</a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
+                    <div class="app-table-wrap">
+                        <table class="table table-sm mb-0 align-middle">
+                            <tbody>
+                                <?php foreach ($categories as $c): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($c['name']) ?></td>
+                                        <td class="text-end d-flex justify-content-end gap-2 flex-wrap">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editCategoryModal" onclick="prefillEditCategory(<?= (int) $c['id'] ?>, '<?= htmlspecialchars($c['name']) ?>')">Sửa</button>
+                                            <a class="btn btn-sm btn-outline-danger" href="<?= BASE_URL ?>?action=admin/delete&type=category&id=<?= (int) $c['id'] ?>" onclick="return confirm('Xóa danh mục này?');">Xóa</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
@@ -260,3 +270,40 @@
         </div>
     <?php endif; ?>
 </div>
+
+<!-- Modal for editing categories -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategoryModalLabel">Chỉnh sửa danh mục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="<?= BASE_URL ?>?action=admin/category-update">
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="editCategoryId" value="">
+                    <div class="mb-3">
+                        <label class="form-label">Tên danh mục</label>
+                        <input class="form-control" type="text" name="name" id="editCategoryName" required maxlength="100">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mã danh mục (tùy chọn)</label>
+                        <input class="form-control" type="text" name="code" id="editCategoryCode" maxlength="40">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function prefillEditCategory(id, name) {
+    document.getElementById('editCategoryId').value = id;
+    document.getElementById('editCategoryName').value = name;
+    document.getElementById('editCategoryCode').value = '';
+}
+</script>

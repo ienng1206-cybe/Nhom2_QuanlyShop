@@ -34,4 +34,27 @@ class CategoryModel extends BaseModel
             return false;
         }
     }
+
+    public function updateById(int $id, string $name, ?string $code = null): bool
+    {
+        $id = (int) $id;
+        $name = trim($name);
+        $code = $code !== null && trim($code) !== '' ? trim($code) : null;
+
+        if ($id <= 0 || $name === '') {
+            return false;
+        }
+
+        try {
+            if ($this->hasCodeColumn()) {
+                $stmt = $this->pdo->prepare('UPDATE categories SET name = :name, code = :code WHERE id = :id');
+                return $stmt->execute(['name' => $name, 'code' => $code, 'id' => $id]);
+            }
+
+            $stmt = $this->pdo->prepare('UPDATE categories SET name = :name WHERE id = :id');
+            return $stmt->execute(['name' => $name, 'id' => $id]);
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
 }
