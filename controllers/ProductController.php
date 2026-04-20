@@ -5,14 +5,18 @@ class ProductController extends BaseController
     public function index()
     {
         $keyword = trim($_GET['keyword'] ?? '');
+        $sort = trim($_GET['sort'] ?? '');
+        $priceRange = trim($_GET['price_range'] ?? '');
         $productModel = new ProductModel();
-        $products = $productModel->allWithCategory($keyword);
+        $products = $productModel->allWithCategory($keyword, $sort, $priceRange);
 
         $this->render('product/index', [
             'title' => 'Danh sách sản phẩm',
             'view' => 'product/index',
             'products' => $products,
             'keyword' => $keyword,
+            'sort' => $sort,
+            'priceRange' => $priceRange,
         ]);
     }
 
