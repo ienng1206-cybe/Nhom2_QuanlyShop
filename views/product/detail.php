@@ -30,28 +30,7 @@
     <?php endif; ?>
 
     <h5>Đánh giá</h5>
-    <?php if (current_user()): ?>
-        <form method="post" action="<?= BASE_URL ?>?action=review/store" class="mb-3">
-            <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-            <div class="row g-2">
-                <div class="col-md-2">
-                    <select class="form-select" name="rating">
-                        <option value="5">5 sao</option>
-                        <option value="4">4 sao</option>
-                        <option value="3">3 sao</option>
-                        <option value="2">2 sao</option>
-                        <option value="1">1 sao</option>
-                    </select>
-                </div>
-                <div class="col-md-7">
-                    <input class="form-control" name="comment" placeholder="Viết nhận xét..." required>
-                </div>
-                <div class="col-md-3">
-                    <button class="btn btn-primary w-100">Gửi đánh giá</button>
-                </div>
-            </div>
-        </form>
-    <?php endif; ?>
+    <p class="text-muted small mb-3">Đánh giá sản phẩm chỉ có thể gửi sau khi đơn hàng đã giao; bạn hãy vào trang chi tiết đơn hàng để đánh giá các sản phẩm đã mua.</p>
 
     <?php foreach ($reviews as $review): ?>
         <div class="review-item border p-2 rounded mb-2">

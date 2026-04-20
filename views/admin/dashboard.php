@@ -209,7 +209,7 @@
                                 <td><?= number_format(order_total_amount($o)) ?> đ</td>
                                 <td>
                                     <?php $badgeClass = preg_replace('/[^a-z]/', '', (string) $rawSt); ?>
-                                    <span class="badge admin-badge-status admin-badge-status--<?= htmlspecialchars($badgeClass) ?>"><?= htmlspecialchars(order_status_label($rawSt)) ?></span>
+                                    <span class="badge admin-badge-status admin-badge-status--<?= htmlspecialchars($badgeClass) ?>"><?= htmlspecialchars(order_status_label($rawSt, $o['created_at'] ?? null)) ?></span>
                                 </td>
                                 <td>
                                     <form method="post" action="<?= BASE_URL ?>?action=admin/order-status" class="d-flex flex-wrap gap-2 align-items-center">

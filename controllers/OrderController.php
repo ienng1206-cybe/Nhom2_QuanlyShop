@@ -78,12 +78,22 @@ class OrderController extends BaseController
             redirect('order/my');
         }
 
+        $items = $orderModel->getOrderItems($id);
+        $canReviewProducts = [];
+        foreach ($items as $item) {
+            $productId = (int) ($item['product_id'] ?? 0);
+            if ($productId > 0) {
+                $canReviewProducts[$productId] = $orderModel->userCanReviewProduct($userId, $productId);
+            }
+        }
+
         $this->render('order/detail', [
             'title' => 'Chi tiết đơn hàng #' . $id,
             'view' => 'order/detail',
             'order' => $order,
-            'items' => $orderModel->getOrderItems($id),
+            'items' => $items,
             'shipping' => $orderModel->getShipping($id),
+            'canReviewProducts' => $canReviewProducts,
         ]);
     }
 
@@ -104,7 +114,7 @@ class OrderController extends BaseController
             $ok = (new OrderModel())->cancelForUser($id, (int) current_user()['id']);
             $_SESSION[$ok ? 'success' : 'error'] = $ok
                 ? 'Đã hủy đơn hàng #' . $id . '.'
-                : 'Không thể hủy đơn (chỉ hủy được đơn đang chờ xử lý).';
+                : 'Không thể hủy đơn (chỉ hủy được đơn đang chờ xử lý, trong vòng 5 phút sau khi đặt).';
         } catch (Throwable $e) {
             $_SESSION['error'] = 'Không thể hủy đơn hàng lúc này.';
         }

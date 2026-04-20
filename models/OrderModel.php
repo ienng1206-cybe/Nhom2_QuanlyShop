@@ -214,6 +214,28 @@ class OrderModel extends BaseModel
         return $stmt->fetchAll();
     }
 
+    public function userCanReviewProduct(int $userId, int $productId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT 1
+            FROM orders o
+            JOIN order_items oi ON oi.order_id = o.id
+            WHERE o.user_id = :user_id
+              AND oi.product_id = :product_id
+              AND (
+                    o.status = "completed"
+                    OR (o.status = "pending" AND TIMESTAMPDIFF(SECOND, o.created_at, NOW()) > 240)
+                  )
+            LIMIT 1'
+        );
+        $stmt->execute([
+            'user_id' => $userId,
+            'product_id' => $productId,
+        ]);
+
+        return (bool) $stmt->fetchColumn();
+    }
+
     public function updateStatus($id, $status)
     {
         $stmt = $this->pdo->prepare('UPDATE orders SET status = :status WHERE id = :id');
@@ -227,10 +249,16 @@ class OrderModel extends BaseModel
     {
         $this->pdo->beginTransaction();
         try {
-            $orderStmt = $this->pdo->prepare('SELECT id, status FROM orders WHERE id = :id AND user_id = :uid LIMIT 1');
+            $orderStmt = $this->pdo->prepare('SELECT id, status, created_at, TIMESTAMPDIFF(SECOND, created_at, NOW()) AS age_seconds FROM orders WHERE id = :id AND user_id = :uid LIMIT 1');
             $orderStmt->execute(['id' => $orderId, 'uid' => $userId]);
             $order = $orderStmt->fetch();
             if (!$order || ($order['status'] ?? '') !== 'pending') {
+                $this->pdo->rollBack();
+                return false;
+            }
+
+            $ageSeconds = isset($order['age_seconds']) ? (int) $order['age_seconds'] : null;
+            if ($ageSeconds === null || $ageSeconds < 0 || $ageSeconds > 120) {
                 $this->pdo->rollBack();
                 return false;
             }

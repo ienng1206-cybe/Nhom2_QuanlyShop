@@ -106,13 +106,34 @@ if (!function_exists('order_total_amount')) {
     }
 }
 
-if (!function_exists('order_status_label')) {
-    function order_status_label(string $status): string
+if (!function_exists('order_effective_status')) {
+    function order_effective_status(string $status, ?string $createdAt = null): string
     {
+        if ($status === 'pending' && $createdAt !== null) {
+            $createdAtTime = strtotime($createdAt);
+            if ($createdAtTime !== false) {
+                if ($createdAtTime + 240 < time()) {
+                    return 'delivered';
+                }
+                if ($createdAtTime + 120 < time()) {
+                    return 'shipping';
+                }
+            }
+        }
+
+        return $status;
+    }
+}
+
+if (!function_exists('order_status_label')) {
+    function order_status_label(string $status, ?string $createdAt = null): string
+    {
+        $status = order_effective_status($status, $createdAt);
         return match ($status) {
             'pending' => 'Chờ xử lý',
             'processing' => 'Đang xử lý',
-            'completed' => 'Hoàn thành',
+            'shipping' => 'Đang giao hàng',
+            'completed', 'delivered' => 'Đã giao hàng',
             'cancelled' => 'Đã hủy',
             default => $status,
         };

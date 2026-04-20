@@ -19,12 +19,12 @@
                         <td>#<?= (int) $order['id'] ?></td>
                             <td><?= number_format(order_total_amount($order)) ?> đ</td>
                         <td>
-                            <span class="badge rounded-pill bg-light text-dark border"><?= htmlspecialchars(order_status_label($order['status'])) ?></span>
+                            <span class="badge rounded-pill bg-light text-dark border"><?= htmlspecialchars(order_status_label($order['status'], $order['created_at'])) ?></span>
                         </td>
                         <td class="small"><?= htmlspecialchars($order['created_at']) ?></td>
                         <td class="d-flex gap-2 flex-wrap">
                             <a class="btn btn-sm btn-outline-primary" href="<?= BASE_URL ?>?action=order/detail&id=<?= (int) $order['id'] ?>">Chi tiết</a>
-                            <?php if (($order['status'] ?? '') === 'pending'): ?>
+                            <?php if (($order['status'] ?? '') === 'pending' && strtotime($order['created_at']) + 120 >= time()): ?>
                                 <form method="post" action="<?= BASE_URL ?>?action=order/cancel" onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn này?');">
                                     <input type="hidden" name="id" value="<?= (int) $order['id'] ?>">
                                     <button class="btn btn-sm btn-outline-danger" type="submit">Hủy đơn</button>

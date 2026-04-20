@@ -10,8 +10,13 @@ class ReviewController extends BaseController
         $comment = trim($_POST['comment'] ?? '');
 
         if ($productId > 0 && $comment !== '') {
-            (new ReviewModel())->create(current_user()['id'], $productId, $rating, $comment);
-            $_SESSION['success'] = 'Cảm ơn bạn đã đánh giá.';
+            $userId = current_user()['id'];
+            if ((new OrderModel())->userCanReviewProduct((int) $userId, $productId)) {
+                (new ReviewModel())->create($userId, $productId, $rating, $comment);
+                $_SESSION['success'] = 'Cảm ơn bạn đã đánh giá.';
+            } else {
+                $_SESSION['error'] = 'Bạn chỉ có thể đánh giá sau khi đơn hàng đã được giao.';
+            }
         }
 
         redirect('product/detail&id=' . $productId);

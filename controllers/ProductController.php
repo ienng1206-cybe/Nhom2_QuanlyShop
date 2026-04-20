@@ -32,11 +32,17 @@ class ProductController extends BaseController
         }
 
         $reviews = $reviewModel->getByProduct($id);
+        $canReview = false;
+        if (current_user()) {
+            $canReview = (new OrderModel())->userCanReviewProduct((int) current_user()['id'], $id);
+        }
+
         $this->render('product/detail', [
             'title' => 'Chi tiết sản phẩm',
             'view' => 'product/detail',
             'product' => $product,
             'reviews' => $reviews,
+            'canReview' => $canReview,
         ]);
     }
 }
