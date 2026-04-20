@@ -4,17 +4,39 @@ class ProductModel extends BaseModel
 {
     protected $table = 'products';
 
-    public function allWithCategory($keyword = '')
+    public function allWithCategory($keyword = '', $sort = '', $priceRange = '')
     {
         $sql = 'SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id';
         $params = [];
+        $conditions = [];
 
         if ($keyword !== '') {
-            $sql .= ' WHERE p.name LIKE :keyword OR p.description LIKE :keyword';
+            $conditions[] = '(p.name LIKE :keyword OR p.description LIKE :keyword)';
             $params['keyword'] = "%{$keyword}%";
         }
 
-        $sql .= ' ORDER BY p.id DESC';
+        if ($priceRange === 'under_1') {
+            $conditions[] = 'p.price < 1000000';
+        } elseif ($priceRange === 'under_3') {
+            $conditions[] = 'p.price >= 1000000 AND p.price < 3000000';
+        } elseif ($priceRange === 'under_5') {
+            $conditions[] = 'p.price >= 3000000 AND p.price < 5000000';
+        } elseif ($priceRange === 'over_5') {
+            $conditions[] = 'p.price >= 5000000';
+        }
+
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $orderBy = 'p.id DESC';
+        if ($sort === 'price_asc') {
+            $orderBy = 'p.price ASC';
+        } elseif ($sort === 'price_desc') {
+            $orderBy = 'p.price DESC';
+        }
+
+        $sql .= ' ORDER BY ' . $orderBy;
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();

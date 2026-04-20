@@ -1,6 +1,10 @@
 <?php
 
+<<<<<<< HEAD
 define('BASE_URL', 'http://localhost/DA1/Nhom2_QuanlyShop-main/');
+=======
+define('BASE_URL', 'http://localhost/D%e1%bb%b1%20%c3%a1n%201/Nhom2_QuanlyShop/');
+>>>>>>> tqt22
 
 define('PATH_ROOT', __DIR__ . '/../');
 define('PATH_VIEW', PATH_ROOT . 'views/');
