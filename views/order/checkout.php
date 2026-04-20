@@ -8,6 +8,9 @@ foreach ($items as $i) {
     <div class="auth-card" style="max-width:none;">
         <h2 class="h5 fw-bold mb-3">Thông tin giao hàng</h2>
         <form method="post" action="<?= BASE_URL ?>?action=order/place">
+            <?php if (!empty($product_id)): ?>
+                <input type="hidden" name="product_id" value="<?= (int) $product_id ?>">
+            <?php endif; ?>
             <div class="mb-3">
                 <label class="form-label">Họ tên</label>
                 <input type="text" class="form-control" value="<?= htmlspecialchars($user['name'] ?? '') ?>" readonly disabled>

@@ -7,10 +7,20 @@ class OrderController extends BaseController
         require_login();
         $userId = (int) current_user()['id'];
         $cartModel = new CartModel();
-        $items = $cartModel->get($userId);
-        if (empty($items)) {
-            $_SESSION['error'] = 'Giỏ hàng đang trống.';
-            redirect('cart/index');
+        $productId = (int) ($_GET['product_id'] ?? 0);
+        if ($productId > 0) {
+            $item = $cartModel->getItem($userId, $productId);
+            if (!$item) {
+                $_SESSION['error'] = 'Sản phẩm không có trong giỏ hàng.';
+                redirect('cart/index');
+            }
+            $items = [$item];
+        } else {
+            $items = $cartModel->get($userId);
+            if (empty($items)) {
+                $_SESSION['error'] = 'Giỏ hàng đang trống.';
+                redirect('cart/index');
+            }
         }
 
         $this->render('order/checkout', [
@@ -18,6 +28,7 @@ class OrderController extends BaseController
             'view' => 'order/checkout',
             'items' => $items,
             'user' => current_user(),
+            'product_id' => $productId,
         ]);
     }
 
@@ -37,7 +48,13 @@ class OrderController extends BaseController
 
         $userId = (int) current_user()['id'];
         $cartModel = new CartModel();
-        $items = $cartModel->get($userId);
+        $productId = (int) ($_POST['product_id'] ?? 0);
+        if ($productId > 0) {
+            $item = $cartModel->getItem($userId, $productId);
+            $items = $item ? [$item] : [];
+        } else {
+            $items = $cartModel->get($userId);
+        }
         if (empty($items)) {
             $_SESSION['error'] = 'Giỏ hàng đang trống.';
             redirect('cart/index');
@@ -50,7 +67,11 @@ class OrderController extends BaseController
                 'address' => $address,
             ]);
             if ($orderId) {
-                $cartModel->clear($userId);
+                if ($productId > 0) {
+                    $cartModel->remove($userId, $productId);
+                } else {
+                    $cartModel->clear($userId);
+                }
                 $_SESSION['success'] = 'Đặt hàng thành công. Mã đơn #' . $orderId;
                 redirect('order/detail&id=' . $orderId);
             }
@@ -62,6 +83,9 @@ class OrderController extends BaseController
                 $msg = substr($msg, 0, 200) . '…';
             }
             $_SESSION['error'] = 'Không thể tạo đơn hàng. ' . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8');
+            if ($productId > 0) {
+                redirect('order/checkout&product_id=' . $productId);
+            }
             redirect('order/checkout');
         }
     }

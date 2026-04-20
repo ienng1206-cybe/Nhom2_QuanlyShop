@@ -47,6 +47,22 @@ class CartModel extends BaseModel
         return $stmt->fetchAll();
     }
 
+    public function getItem(int $userId, int $productId): ?array
+    {
+        $cid = $this->ensureCartId($userId);
+        $img = $this->productsHasImageColumn() ? ', p.image' : '';
+        $sql = "SELECT ci.product_id AS id, ci.quantity AS qty, p.name, p.price{$img}, p.stock
+                FROM cart_items ci
+                INNER JOIN products p ON p.id = ci.product_id
+                WHERE ci.cart_id = :cid AND ci.product_id = :pid
+                LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['cid' => $cid, 'pid' => $productId]);
+
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
     public function countItems(int $userId): int
     {
         $stmt = $this->pdo->prepare(

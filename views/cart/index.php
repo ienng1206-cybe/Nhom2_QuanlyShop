@@ -11,7 +11,7 @@
                     <th style="width:120px;">Đơn giá</th>
                     <th style="width:140px;">Số lượng</th>
                     <th style="width:120px;">Thành tiền</th>
-                    <th style="width:100px;"></th>
+                    <th style="width:140px;">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,7 +43,10 @@
                         </td>
                         <td class="fw-semibold"><?= number_format($line) ?> đ</td>
                         <td>
-                            <a class="btn btn-sm btn-outline-danger" href="<?= BASE_URL ?>?action=cart/remove&id=<?= (int) $item['id'] ?>" onclick="return confirm('Xóa sản phẩm này khỏi giỏ?');">Xóa</a>
+                            <div class="d-flex flex-column gap-2">
+                                <a class="btn btn-sm btn-outline-success" href="<?= BASE_URL ?>?action=order/checkout&product_id=<?= (int) $item['id'] ?>">Thanh toán</a>
+                                <a class="btn btn-sm btn-outline-danger" href="<?= BASE_URL ?>?action=cart/remove&id=<?= (int) $item['id'] ?>" onclick="return confirm('Xóa sản phẩm này khỏi giỏ?');">Xóa</a>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
