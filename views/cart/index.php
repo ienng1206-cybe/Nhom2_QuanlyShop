@@ -38,8 +38,7 @@
                         <td>
                             <form method="post" action="<?= BASE_URL ?>?action=cart/update" class="d-flex gap-1 align-items-center flex-wrap">
                                 <input type="hidden" name="product_id" value="<?= (int) $item['id'] ?>">
-                                <input type="number" class="form-control form-control-sm" name="qty" value="<?= (int) $item['qty'] ?>" min="1" max="<?= (int) $item['stock'] ?>" style="width:4.5rem;">
-                                <button type="submit" class="btn btn-sm btn-outline-secondary">Cập nhật</button>
+                                <input type="number" class="form-control form-control-sm cart-qty-input" name="qty" value="<?= (int) $item['qty'] ?>" min="1" max="<?= (int) $item['stock'] ?>" style="width:4.5rem;">
                             </form>
                         </td>
                         <td class="fw-semibold"><?= number_format($line) ?> đ</td>
@@ -58,5 +57,17 @@
                 <a class="btn btn-success btn-lg" href="<?= BASE_URL ?>?action=order/checkout">Tiến hành thanh toán</a>
             </div>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.cart-qty-input').forEach(function (input) {
+                    input.addEventListener('change', function () {
+                        var form = input.closest('form');
+                        if (form) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        </script>
     <?php endif; ?>
 </div>
