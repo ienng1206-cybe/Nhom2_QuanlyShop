@@ -1,0 +1,504 @@
+/* Shop — lớp phủ giao diện (kèm Bootstrap 5) */
+
+:root {
+    --app-primary: #0d6efd;
+    --app-primary-dark: #0a58ca;
+    --app-accent: #10b981;
+    --app-surface: #ffffff;
+    --app-muted: #64748b;
+    --app-border: rgba(15, 23, 42, 0.08);
+    --app-radius: 14px;
+    --app-radius-sm: 10px;
+    --app-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+    --app-shadow-hover: 0 12px 40px rgba(15, 23, 42, 0.1);
+    --bs-primary: #2563eb;
+    --bs-primary-rgb: 37, 99, 235;
+    --bs-success: #059669;
+    --bs-success-rgb: 5, 150, 105;
+    --bs-body-bg: #f1f5f9;
+    --bs-body-color: #1e293b;
+}
+
+.app-body {
+    font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(165deg, #dbeafe 0%, #bfdbfe 42%, #93c5fd 100%);
+    background-attachment: fixed;
+}
+
+.app-main {
+    flex: 1;
+    padding-bottom: 2rem;
+}
+
+/* Navbar */
+.app-navbar {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.app-navbar .navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #0f172a !important;
+    font-size: 1.15rem;
+}
+
+.app-navbar .nav-link {
+    font-weight: 500;
+    color: #475569 !important;
+    border-radius: 8px;
+    margin: 0 0.1rem;
+    padding: 0.45rem 0.75rem !important;
+    transition: color 0.2s, background 0.2s;
+}
+
+.app-navbar .nav-link:hover {
+    color: var(--bs-primary) !important;
+    background: rgba(37, 99, 235, 0.08);
+}
+
+.app-navbar .nav-link.text-danger:hover {
+    background: rgba(220, 53, 69, 0.08) !important;
+}
+
+.app-navbar .navbar-text {
+    font-size: 0.9rem;
+    color: var(--app-muted) !important;
+}
+
+/* Page title */
+.page-header .page-title {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #0f172a;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.page-header .page-lead {
+    color: var(--app-muted);
+    font-size: 0.95rem;
+    max-width: 42rem;
+}
+
+/* Alerts */
+.app-main .alert {
+    border: none;
+    border-radius: var(--app-radius-sm);
+    box-shadow: var(--app-shadow);
+}
+
+/* Cards (sản phẩm) */
+.app-main .card {
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow);
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.app-main .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--app-shadow-hover);
+}
+
+.app-main .card .card-body {
+    padding: 1.25rem 1.35rem;
+}
+
+.app-main .card .card-title,
+.app-main .card h5 {
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    color: #0f172a;
+}
+
+.product-thumb {
+    height: 160px;
+    background: linear-gradient(135deg, #e0e7ff 0%, #cffafe 50%, #dbeafe 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* Hero */
+.hero-banner {
+    position: relative;
+    border-radius: var(--app-radius);
+    padding: 2rem 2.25rem;
+    background: linear-gradient(125deg, #1e3a8a 0%, #2563eb 42%, #0d9488 100%);
+    color: #fff;
+    box-shadow: 0 20px 50px rgba(37, 99, 235, 0.35);
+    overflow: hidden;
+}
+
+.hero-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 45%);
+    pointer-events: none;
+}
+
+.hero-banner .hero-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-banner h2 {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+    margin-bottom: 0.5rem;
+}
+
+.hero-banner p {
+    opacity: 0.92;
+    margin-bottom: 1.25rem;
+    max-width: 36rem;
+}
+
+.hero-banner .btn-light {
+    font-weight: 600;
+    padding: 0.55rem 1.35rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.hero-banner .btn-light:hover {
+    transform: translateY(-1px);
+}
+
+/* Search panel */
+.search-panel {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--app-shadow);
+}
+
+.search-panel .form-control {
+    border-radius: 10px;
+    border-color: #e2e8f0;
+}
+
+.search-panel .form-control:focus {
+    border-color: rgba(37, 99, 235, 0.45);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.12);
+}
+
+.search-panel .btn {
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* Forms (đăng nhập / đăng ký) */
+.auth-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    padding: 2rem;
+    box-shadow: var(--app-shadow);
+    max-width: 420px;
+}
+
+.auth-card .form-control {
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+}
+
+.auth-card .btn {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 0.55rem 1.25rem;
+}
+
+/* Tables */
+.app-table-wrap {
+    background: var(--app-surface);
+    border-radius: var(--app-radius);
+    border: 1px solid var(--app-border);
+    box-shadow: var(--app-shadow);
+    overflow: hidden;
+}
+
+.app-main .table {
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.app-main .table thead th {
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--app-muted);
+    background: #f8fafc;
+    border-bottom: 1px solid var(--app-border);
+    padding: 0.85rem 1rem;
+}
+
+.app-main .table tbody td {
+    padding: 0.9rem 1rem;
+}
+
+.app-main .table-bordered > :not(caption) > * > * {
+    border-color: var(--app-border);
+}
+
+/* Reviews */
+.review-item {
+    background: #f8fafc;
+    border: 1px solid var(--app-border) !important;
+    border-radius: var(--app-radius-sm) !important;
+    padding: 1rem 1.15rem !important;
+}
+
+.review-item strong {
+    color: #0f172a;
+}
+
+/* Admin stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.stats-grid li {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-sm);
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    box-shadow: var(--app-shadow);
+}
+
+.stats-grid li strong {
+    display: block;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--bs-primary);
+    margin-bottom: 0.15rem;
+}
+
+.section-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #0f172a;
+    margin-top: 1.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 2px solid rgba(37, 99, 235, 0.2);
+}
+
+.section-title:first-child {
+    margin-top: 0;
+}
+
+/* Buttons */
+.app-main .btn {
+    font-weight: 600;
+    border-radius: 10px;
+}
+
+.app-main .btn-sm {
+    border-radius: 8px;
+}
+
+/* Footer */
+.app-footer {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(8px);
+}
+
+/* Empty state */
+.empty-hint {
+    color: var(--app-muted);
+    padding: 2rem;
+    text-align: center;
+    background: var(--app-surface);
+    border-radius: var(--app-radius);
+    border: 1px dashed var(--app-border);
+}
+
+/* Visual polish */
+.page-header {
+    margin-bottom: 1.35rem !important;
+}
+
+.page-header .page-title {
+    position: relative;
+    display: inline-block;
+}
+
+.page-header .page-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.45rem;
+    width: 65%;
+    height: 0.28rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #2563eb, #06b6d4);
+    opacity: 0.25;
+}
+
+.app-navbar {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+    box-shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
+}
+
+.app-navbar .navbar-brand {
+    background: linear-gradient(120deg, #0f172a, #1d4ed8 70%, #0d9488);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+}
+
+.app-navbar .nav-link {
+    position: relative;
+}
+
+.app-navbar .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.25rem;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #2563eb, #0ea5e9);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.25s ease;
+}
+
+.app-navbar .nav-link:hover::after {
+    transform: scaleX(1);
+}
+
+.hero-banner {
+    isolation: isolate;
+}
+
+.hero-banner::before {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    right: -70px;
+    bottom: -90px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0));
+    z-index: 0;
+}
+
+.hero-banner .btn-light {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-banner .btn-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.search-panel,
+.auth-card,
+.app-table-wrap {
+    backdrop-filter: blur(3px);
+}
+
+.app-main .card {
+    position: relative;
+}
+
+.app-main .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, rgba(37, 99, 235, 0.08), transparent 55%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+
+.app-main .card:hover::before {
+    opacity: 1;
+}
+
+.app-main .btn {
+    transition: transform 0.16s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.app-main .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.14);
+}
+
+.app-main .btn-primary,
+.app-main .btn-success {
+    border: none;
+}
+
+.app-main .btn-primary {
+    background-image: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.app-main .btn-success {
+    background-image: linear-gradient(135deg, #10b981, #059669);
+}
+
+.app-main .table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.app-main .table tbody tr:hover {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.review-item {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 6px 16px rgba(15, 23, 42, 0.04);
+}
+
+.app-footer {
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 991.98px) {
+    .app-navbar .navbar-nav {
+        gap: 0.2rem;
+        padding-top: 0.35rem;
+        padding-bottom: 0.15rem;
+    }
+
+    .hero-banner {
+        padding: 1.35rem 1.25rem;
+    }
+
+    .app-main .card .card-body {
+        padding: 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-main .btn,
+    .app-main .card,
+    .app-navbar .nav-link,
+    .hero-banner .btn-light {
+        transition: none !important;
+    }
+}
+
