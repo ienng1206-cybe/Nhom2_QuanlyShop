@@ -1,2 +1,0 @@
--- Nếu bảng orders dùng cột `total` thay vì `total_amount`, đổi tên cho khớp code:
--- ALTER TABLE orders CHANGE total total_amount DECIMAL(12,2) NOT NULL DEFAULT 0;
