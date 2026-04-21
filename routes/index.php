@@ -31,9 +31,14 @@ match ($action) {
     'admin/category-update' => (new AdminController())->updateCategory(),
     'admin/products' => (new AdminController())->products(),
     'admin/product-update' => (new AdminController())->updateProduct(),
+    'admin/orders' => (new AdminController())->orders(),
     'admin/order-status' => (new AdminController())->updateOrderStatus(),
     'admin/users' => (new AdminController())->users(),
+<<<<<<< HEAD
     'admin/update-user' => (new AdminController())->updateUser(),
+=======
+    'admin/reviews' => (new AdminController())->reviews(),
+>>>>>>> 0536e52 (sưa trang admin)
     'admin/delete' => (new AdminController())->delete(),
 
     default => (new HomeController())->index(),

@@ -17,6 +17,7 @@
 </head>
 
 <body class="admin-body">
+    <?php $currentAction = $_GET['action'] ?? 'admin/dashboard'; ?>
     <header class="admin-topbar">
         <div class="admin-topbar-inner">
             <a class="admin-brand" href="<?= BASE_URL ?>?action=admin/dashboard">
@@ -24,7 +25,9 @@
                 <span class="admin-brand-text">Quản trị</span>
             </a>
             <nav class="admin-topnav d-none d-md-flex align-items-center gap-1">
-                <a class="admin-nav-link active" href="<?= BASE_URL ?>?action=admin/dashboard">Bảng điều khiển</a>
+                <a class="admin-nav-link <?= $currentAction === 'admin/dashboard' ? 'active' : '' ?>" href="<?= BASE_URL ?>?action=admin/dashboard">Tổng quan</a>
+                <a class="admin-nav-link <?= $currentAction === 'admin/orders' ? 'active' : '' ?>" href="<?= BASE_URL ?>?action=admin/orders">Đơn hàng</a>
+                <a class="admin-nav-link <?= $currentAction === 'admin/products' ? 'active' : '' ?>" href="<?= BASE_URL ?>?action=admin/products">Sản phẩm</a>
             </nav>
             <div class="admin-topbar-actions d-flex align-items-center gap-2 flex-wrap">
                 <a class="btn btn-outline-secondary btn-sm d-md-none" href="<?= BASE_URL ?>?action=admin/dashboard">Tổng quan</a>
@@ -40,8 +43,23 @@
     <div class="admin-layout d-flex">
         <aside class="admin-sidebar d-none d-lg-flex flex-column">
             <div class="admin-sidebar-label">Menu</div>
-            <a class="admin-side-link active" href="<?= BASE_URL ?>?action=admin/dashboard">
+            <a class="admin-side-link <?= $currentAction === 'admin/dashboard' ? 'active' : '' ?>" href="<?= BASE_URL ?>?action=admin/dashboard">
                 <span class="admin-side-icon">⌂</span> Tổng quan
+            </a>
+            <a class="admin-side-link <?= $currentAction === 'admin/categories' ? 'active' : '' ?>" href="<?= BASE_URL ?>?action=admin/categories">
+                <span class="admin-side-icon">▦</span> Danh mục
+            </a>
+            <a class="admin-side-link <?= $currentAction === 'admin/products' ? 'active' : '' ?>" href="<?= BASE_URL ?>?action=admin/products">
+                <span class="admin-side-icon">◼</span> Sản phẩm
+            </a>
+            <a class="admin-side-link <?= $currentAction === 'admin/orders' ? 'active' : '' ?>" href="<?= BASE_URL ?>?action=admin/orders">
+                <span class="admin-side-icon">≡</span> Đơn hàng
+            </a>
+            <a class="admin-side-link <?= $currentAction === 'admin/users' ? 'active' : '' ?>" href="<?= BASE_URL ?>?action=admin/users">
+                <span class="admin-side-icon">☺</span> Người dùng
+            </a>
+            <a class="admin-side-link <?= $currentAction === 'admin/reviews' ? 'active' : '' ?>" href="<?= BASE_URL ?>?action=admin/reviews">
+                <span class="admin-side-icon">★</span> Đánh giá
             </a>
             <div class="admin-sidebar-label mt-4">Liên kết</div>
             <a class="admin-side-link" href="<?= BASE_URL ?>" target="_blank" rel="noopener">

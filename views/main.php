@@ -21,7 +21,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-light app-navbar shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="<?= BASE_URL ?>">Shop Giày Thể Thao</a>
+            <a class="navbar-brand" href="<?= BASE_URL ?>">YTVV Shop</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Mở menu">
                 <span class="navbar-toggler-icon"></span>
             </button>

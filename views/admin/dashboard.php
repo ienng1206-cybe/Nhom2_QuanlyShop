@@ -9,12 +9,19 @@
             <div>
                 <p class="admin-hero-label mb-1">Bảng điều khiển</p>
                 <h2 class="admin-hero-title mb-0">Quản trị cửa hàng</h2>
-                <p class="admin-hero-lead mb-0 mt-2">Thêm danh mục, sản phẩm và theo dõi đơn hàng.</p>
+                <p class="admin-hero-lead mb-0 mt-2">Chọn từng chức năng ở menu để đi theo đúng luồng quản trị.</p>
             </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a class="btn btn-light admin-hero-btn" href="<?= BASE_URL ?>?action=admin/orders">Đi tới đơn hàng</a>
+                <a class="btn btn-outline-light admin-hero-btn" href="<?= BASE_URL ?>">Mở cửa hàng ↗</a>
+            </div>
+<<<<<<< HEAD
             <div class="d-flex gap-2 flex-wrap">
                 <a class="btn btn-primary" href="<?= BASE_URL ?>?action=admin/users">👥 Quản lý tài khoản</a>
                 <a class="btn btn-light admin-hero-btn" href="<?= BASE_URL ?>">← Về trang bán hàng</a>
             </div>
+=======
+>>>>>>> 0536e52 (sưa trang admin)
         </div>
     </div>
 
@@ -51,13 +58,14 @@
         </div>
     </div>
 
-    <div class="row g-4">
-        <div class="col-lg-6">
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-4">
             <div class="admin-card h-100">
                 <div class="admin-card-header">
                     <h3 class="admin-card-title">Danh mục</h3>
-                    <p class="admin-card-desc">Thêm nhóm sản phẩm mới</p>
+                    <p class="admin-card-desc">Tạo / xóa / xem danh mục</p>
                 </div>
+<<<<<<< HEAD
                 <form class="admin-form" method="post" action="<?= BASE_URL ?>?action=admin/categories">
                     <div class="mb-3">
                         <label class="form-label">Tên danh mục</label>
@@ -84,52 +92,49 @@
                         </table>
                     </div>
                 <?php endif; ?>
+=======
+                <a class="btn btn-primary w-100" href="<?= BASE_URL ?>?action=admin/categories">Quản lý danh mục →</a>
+>>>>>>> 0536e52 (sưa trang admin)
             </div>
         </div>
-
-        <div class="col-lg-6">
+        <div class="col-md-6 col-xl-4">
             <div class="admin-card h-100">
                 <div class="admin-card-header">
                     <h3 class="admin-card-title">Sản phẩm</h3>
-                    <p class="admin-card-desc">Thêm sản phẩm vào danh mục</p>
+                    <p class="admin-card-desc">Thêm / sửa / xóa sản phẩm</p>
                 </div>
-                <form class="admin-form" method="post" action="<?= BASE_URL ?>?action=admin/products">
-                    <div class="mb-3">
-                        <label class="form-label">Danh mục</label>
-                        <select class="form-select" name="category_id" required>
-                            <option value="">— Chọn danh mục —</option>
-                            <?php foreach ($categories as $c): ?>
-                                <option value="<?= (int) $c['id'] ?>"><?= htmlspecialchars($c['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tên sản phẩm</label>
-                        <input class="form-control" type="text" name="name" required maxlength="150" placeholder="Tên hiển thị">
-                    </div>
-                    <div class="row g-2 mb-3">
-                        <div class="col-sm-6">
-                            <label class="form-label">Giá (đ)</label>
-                            <input class="form-control" type="number" name="price" step="0.01" min="0" placeholder="0">
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="form-label">Tồn kho</label>
-                            <input class="form-control" type="number" name="stock" min="0" placeholder="0">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Link ảnh <span class="text-muted fw-normal">(tùy chọn)</span></label>
-                        <input class="form-control" type="text" name="image" placeholder="https://... ">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Mô tả</label>
-                        <textarea class="form-control" name="description" rows="3" placeholder="Mô tả ngắn"></textarea>
-                    </div>
-                    <button class="btn btn-success" type="submit">Thêm sản phẩm</button>
-                </form>
+                <a class="btn btn-success w-100" href="<?= BASE_URL ?>?action=admin/products">Quản lý sản phẩm →</a>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="admin-card h-100">
+                <div class="admin-card-header">
+                    <h3 class="admin-card-title">Đơn hàng</h3>
+                    <p class="admin-card-desc">Theo dõi và cập nhật trạng thái</p>
+                </div>
+                <a class="btn btn-outline-light w-100" href="<?= BASE_URL ?>?action=admin/orders">Quản lý đơn hàng →</a>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="admin-card h-100">
+                <div class="admin-card-header">
+                    <h3 class="admin-card-title">Người dùng</h3>
+                    <p class="admin-card-desc">Danh sách tài khoản và vai trò</p>
+                </div>
+                <a class="btn btn-outline-secondary w-100" href="<?= BASE_URL ?>?action=admin/users">Quản lý người dùng →</a>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="admin-card h-100">
+                <div class="admin-card-header">
+                    <h3 class="admin-card-title">Đánh giá</h3>
+                    <p class="admin-card-desc">Xem / xóa đánh giá sản phẩm</p>
+                </div>
+                <a class="btn btn-outline-secondary w-100" href="<?= BASE_URL ?>?action=admin/reviews">Quản lý đánh giá →</a>
             </div>
         </div>
     </div>
+<<<<<<< HEAD
 
     <?php if (!empty($editingProduct)): ?>
         <div class="admin-card mt-4">
@@ -269,6 +274,8 @@
             </div>
         </div>
     <?php endif; ?>
+=======
+>>>>>>> 0536e52 (sưa trang admin)
 </div>
 
 <!-- Modal for editing categories -->

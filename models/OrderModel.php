@@ -54,7 +54,7 @@ class OrderModel extends BaseModel
         return self::$ordersAmountColumn;
     }
 
-    /** Cột số lượng trong order_items: quantity (chuẩn) hoặc qty (CSDL cũ). */
+ 
     private function orderItemsQtyColumn(): string
     {
         if (self::$orderItemsQtyColumn !== null) {

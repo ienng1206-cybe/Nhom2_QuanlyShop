@@ -32,12 +32,6 @@ class AdminController extends BaseController
             $admin_reviews_missing = true;
         }
 
-        $editProductId = (int) ($_GET['edit_product_id'] ?? 0);
-        $editingProduct = null;
-        if ($editProductId > 0) {
-            $editingProduct = (new ProductModel())->find($editProductId);
-        }
-
         $this->renderAdminPage('admin/dashboard', [
             'title' => 'Bảng điều khiển',
             'users' => $this->adminAll(UserModel::class),
@@ -46,7 +40,6 @@ class AdminController extends BaseController
             'orders' => $this->adminAll(OrderModel::class),
             'reviews' => $reviews,
             'admin_reviews_missing' => $admin_reviews_missing,
-            'editingProduct' => $editingProduct,
         ]);
     }
 
@@ -61,13 +54,18 @@ class AdminController extends BaseController
             } else {
                 $ok = (new CategoryModel())->create($name, $code !== '' ? $code : null);
                 if ($ok) {
-                    $_SESSION['success'] = 'Đã thêm danh mục «' . $name . '». Bạn có thể chọn danh mục này khi thêm sản phẩm.';
+                    $_SESSION['success'] = 'Đã thêm danh mục «' . $name . '».';
                 } else {
                     $_SESSION['error'] = 'Không thêm được danh mục. Có thể trùng mã (code) hoặc lỗi CSDL — đổi mã khác hoặc chạy migrate_categories_code.sql.';
                 }
             }
+            redirect('admin/categories');
         }
-        redirect('admin/dashboard');
+
+        $this->renderAdminPage('admin/categories', [
+            'title' => 'Danh mục',
+            'categories' => $this->adminAll(CategoryModel::class),
+        ]);
     }
 
     public function products()
@@ -92,15 +90,28 @@ class AdminController extends BaseController
                     $_SESSION['error'] = 'Lỗi khi thêm sản phẩm. Kiểm tra danh mục có tồn tại và bảng products (import schema.sql hoặc migrate).';
                 }
             }
+            redirect('admin/products');
         }
-        redirect('admin/dashboard');
+
+        $editProductId = (int) ($_GET['edit_product_id'] ?? 0);
+        $editingProduct = null;
+        if ($editProductId > 0) {
+            $editingProduct = (new ProductModel())->find($editProductId);
+        }
+
+        $this->renderAdminPage('admin/products', [
+            'title' => 'Sản phẩm',
+            'categories' => $this->adminAll(CategoryModel::class),
+            'products' => $this->adminAll(ProductModel::class),
+            'editingProduct' => $editingProduct,
+        ]);
     }
 
     public function updateProduct()
     {
         require_admin();
         if ($this->requestMethod() !== 'POST') {
-            redirect('admin/dashboard');
+            redirect('admin/products');
         }
 
         $id = (int) ($_POST['id'] ?? 0);
@@ -122,7 +133,7 @@ class AdminController extends BaseController
             $_SESSION['error'] = 'Lỗi khi cập nhật sản phẩm.';
         }
 
-        redirect('admin/dashboard');
+        redirect('admin/products');
     }
 
     public function updateOrderStatus()
@@ -134,7 +145,46 @@ class AdminController extends BaseController
             $ok = (new OrderModel())->updateStatus($id, $status);
             $_SESSION[$ok ? 'success' : 'error'] = $ok ? 'Đã cập nhật trạng thái đơn hàng #' . $id . '.' : 'Không cập nhật được trạng thái.';
         }
-        redirect('admin/dashboard');
+        redirect('admin/orders');
+    }
+
+    public function orders()
+    {
+        require_admin();
+
+        $this->renderAdminPage('admin/orders', [
+            'title' => 'Đơn hàng',
+            'orders' => $this->adminAll(OrderModel::class),
+        ]);
+    }
+
+    public function users()
+    {
+        require_admin();
+
+        $this->renderAdminPage('admin/users', [
+            'title' => 'Người dùng',
+            'users' => $this->adminAll(UserModel::class),
+        ]);
+    }
+
+    public function reviews()
+    {
+        require_admin();
+
+        $reviews = [];
+        $admin_reviews_missing = false;
+        try {
+            $reviews = (new ReviewModel())->all();
+        } catch (Throwable $e) {
+            $admin_reviews_missing = true;
+        }
+
+        $this->renderAdminPage('admin/reviews', [
+            'title' => 'Đánh giá',
+            'reviews' => $reviews,
+            'admin_reviews_missing' => $admin_reviews_missing,
+        ]);
     }
 
     public function delete()
@@ -299,6 +349,14 @@ class AdminController extends BaseController
             }
         }
 
-        redirect('admin/dashboard');
+        $back = match ($type) {
+            'user' => 'admin/users',
+            'category' => 'admin/categories',
+            'product' => 'admin/products',
+            'order' => 'admin/orders',
+            'review' => 'admin/reviews',
+            default => 'admin/dashboard',
+        };
+        redirect($back);
     }
 }
