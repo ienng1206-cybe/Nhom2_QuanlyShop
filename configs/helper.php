@@ -12,9 +12,22 @@ if (!function_exists('debug')) {
 if (!function_exists('upload_file')) {
     function upload_file($folder, $file)
     {
-        $targetFile = $folder . '/' . time() . '-' . $file["name"];
+        $folder = trim((string) $folder, '/');
+        $uploadRoot = rtrim(PATH_ASSETS_UPLOADS, '/\\');
+        $targetDir = $uploadRoot . '/' . $folder;
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
 
-        if (move_uploaded_file($file["tmp_name"], PATH_ASSETS_UPLOADS . $targetFile)) {
+        $originalName = (string) ($file['name'] ?? '');
+        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        $safeName = preg_replace('/[^a-zA-Z0-9_-]/', '', pathinfo($originalName, PATHINFO_FILENAME));
+        if ($safeName === '') {
+            $safeName = 'img';
+        }
+        $targetFile = $folder . '/' . time() . '-' . $safeName . ($ext !== '' ? '.' . $ext : '');
+
+        if (move_uploaded_file($file["tmp_name"], $uploadRoot . '/' . $targetFile)) {
             return $targetFile;
         }
 
@@ -78,6 +91,10 @@ if (!function_exists('product_image_url')) {
         $image = ltrim($image, '/');
         if (str_starts_with($image, 'assets/uploads/')) {
             return BASE_URL . $image;
+        }
+        // Hỗ trợ dữ liệu cũ lưu "uploads/xxx.jpg"
+        if (str_starts_with($image, 'uploads/')) {
+            return BASE_URL . 'assets/' . $image;
         }
 
         return BASE_ASSETS_UPLOADS . $image;

@@ -311,6 +311,16 @@
     margin-bottom: 0;
 }
 
+/* Khi dùng đồng thời app-table-wrap + admin-table-scroll thì phải cho phép cuộn */
+.admin-page .app-table-wrap.admin-table-scroll {
+    overflow: auto;
+}
+
+/* Trang đơn hàng: dùng cuộn toàn trang để tránh kẹt vùng cuộn con */
+.admin-page .app-table-wrap {
+    overflow: visible;
+}
+
 .admin-page .table,
 .admin-main .table {
     --bs-table-bg: transparent;
@@ -372,6 +382,15 @@
 
 .admin-main .btn-sm {
     border-radius: 8px;
+}
+
+.admin-product-thumb {
+    width: 54px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--adm-border);
+    background: rgba(15, 23, 42, 0.6);
 }
 
 /* Mobile: sidebar hidden — topbar đủ */

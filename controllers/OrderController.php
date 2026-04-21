@@ -38,6 +38,8 @@ class OrderController extends BaseController
             'view' => 'order/checkout',
             'items' => $items,
             'user' => current_user(),
+            'defaultRecipientName' => (string) (current_user()['name'] ?? ''),
+            'defaultRecipientEmail' => (string) (current_user()['email'] ?? ''),
             'product_id' => $productId,
         ]);
     }
@@ -51,9 +53,17 @@ class OrderController extends BaseController
 
         $phone = trim($_POST['phone'] ?? '');
         $address = trim($_POST['address'] ?? '');
+        $recipientName = trim($_POST['recipient_name'] ?? '');
+        $recipientEmail = trim($_POST['recipient_email'] ?? '');
         if ($phone === '' || $address === '') {
             $_SESSION['error'] = 'Vui lòng nhập đầy đủ số điện thoại và địa chỉ giao hàng.';
             redirect('order/checkout');
+        }
+        if ($recipientName === '') {
+            $recipientName = (string) (current_user()['name'] ?? '');
+        }
+        if ($recipientEmail === '') {
+            $recipientEmail = (string) (current_user()['email'] ?? '');
         }
 
         $userId = (int) current_user()['id'];
@@ -85,6 +95,8 @@ class OrderController extends BaseController
             $orderId = $orderModel->createFromCart($userId, $items, [
                 'phone' => $phone,
                 'address' => $address,
+                'recipient_name' => $recipientName,
+                'recipient_email' => $recipientEmail,
             ]);
             if ($orderId) {
                 if ($productId > 0) {

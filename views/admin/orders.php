@@ -15,11 +15,25 @@
             <h3 class="admin-card-title">Danh sách đơn hàng</h3>
             <p class="admin-card-desc">Đổi trạng thái để theo dõi tiến độ</p>
         </div>
+        <form class="row g-2 mb-3" method="get" action="<?= BASE_URL ?>">
+            <input type="hidden" name="action" value="admin/orders">
+            <div class="col-md-5">
+                <input class="form-control" type="text" name="keyword" value="<?= htmlspecialchars((string) ($keyword ?? '')) ?>" placeholder="Tìm theo tên hoặc email người đặt">
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+            </div>
+            <?php if (!empty($keyword)): ?>
+                <div class="col-auto">
+                    <a class="btn btn-outline-secondary" href="<?= BASE_URL ?>?action=admin/orders">Xóa lọc</a>
+                </div>
+            <?php endif; ?>
+        </form>
 
         <?php if (empty($orders)): ?>
             <p class="text-muted mb-0">Chưa có đơn hàng nào.</p>
         <?php else: ?>
-            <div class="app-table-wrap admin-table-scroll">
+            <div class="app-table-wrap">
                 <table class="table table-hover mb-0 align-middle">
                     <thead>
                         <tr>
@@ -47,9 +61,17 @@
                                     </div>
                                 </td>
                                 <td>
+                                    <?php $recipientName = trim((string) ($o['ship_recipient_name'] ?? '')); ?>
+                                    <?php $recipientEmail = trim((string) ($o['ship_recipient_email'] ?? '')); ?>
                                     <?php $shipPhone = trim((string) ($o['ship_phone'] ?? '')); ?>
                                     <?php $shipAddr = trim((string) ($o['ship_address'] ?? '')); ?>
                                     <?php if ($shipPhone !== '' || $shipAddr !== ''): ?>
+                                        <?php if ($recipientName !== ''): ?>
+                                            <div class="fw-semibold"><?= htmlspecialchars($recipientName) ?></div>
+                                        <?php endif; ?>
+                                        <?php if ($recipientEmail !== ''): ?>
+                                            <div class="text-secondary small"><?= htmlspecialchars($recipientEmail) ?></div>
+                                        <?php endif; ?>
                                         <div class="fw-semibold"><?= htmlspecialchars($shipPhone) ?></div>
                                         <div class="text-secondary small"><?= htmlspecialchars($shipAddr) ?></div>
                                     <?php else: ?>
@@ -66,6 +88,7 @@
                                 <td>
                                     <form method="post" action="<?= BASE_URL ?>?action=admin/order-status" class="d-flex flex-wrap gap-2 align-items-center">
                                         <input type="hidden" name="id" value="<?= (int) ($o['id'] ?? 0) ?>">
+                                        <input type="hidden" name="keyword" value="<?= htmlspecialchars((string) ($keyword ?? '')) ?>">
                                         <select name="status" class="form-select form-select-sm" style="min-width:9rem;">
                                             <option value="pending" <?= $rawSt === 'pending' ? 'selected' : '' ?>>Chờ xử lý</option>
                                             <option value="processing" <?= $rawSt === 'processing' ? 'selected' : '' ?>>Đang xử lý</option>
@@ -76,6 +99,8 @@
                                     </form>
                                 </td>
                                 <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-info me-1"
+                                        href="<?= BASE_URL ?>?action=admin/order-detail&id=<?= (int) ($o['id'] ?? 0) ?>">Chi tiết</a>
                                     <a class="btn btn-sm btn-outline-danger"
                                         href="<?= BASE_URL ?>?action=admin/delete&type=order&id=<?= (int) ($o['id'] ?? 0) ?>"
                                         onclick="return confirm('Xóa đơn hàng này?');">Xóa</a>

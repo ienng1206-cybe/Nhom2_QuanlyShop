@@ -92,6 +92,8 @@ CREATE TABLE IF NOT EXISTS shipping (
     order_id INT,
     address TEXT,
     phone VARCHAR(20),
+    recipient_name VARCHAR(120),
+    recipient_email VARCHAR(150),
     status VARCHAR(50),
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );

@@ -11,6 +11,8 @@ class OrderModel extends BaseModel
     private static ?string $ordersAmountColumn = null;
 
     private static ?string $orderItemsQtyColumn = null;
+    private static ?bool $shippingHasRecipientNameColumn = null;
+    private static ?bool $shippingHasRecipientEmailColumn = null;
 
     private function hasShippingTable(): bool
     {
@@ -33,6 +35,32 @@ class OrderModel extends BaseModel
         }
 
         return self::$shippingHasStatusColumn;
+    }
+
+    private function shippingHasRecipientNameColumn(): bool
+    {
+        if (!$this->hasShippingTable()) {
+            return false;
+        }
+        if (self::$shippingHasRecipientNameColumn === null) {
+            $r = $this->pdo->query("SHOW COLUMNS FROM `shipping` LIKE 'recipient_name'");
+            self::$shippingHasRecipientNameColumn = (bool) $r->fetch(PDO::FETCH_NUM);
+        }
+
+        return self::$shippingHasRecipientNameColumn;
+    }
+
+    private function shippingHasRecipientEmailColumn(): bool
+    {
+        if (!$this->hasShippingTable()) {
+            return false;
+        }
+        if (self::$shippingHasRecipientEmailColumn === null) {
+            $r = $this->pdo->query("SHOW COLUMNS FROM `shipping` LIKE 'recipient_email'");
+            self::$shippingHasRecipientEmailColumn = (bool) $r->fetch(PDO::FETCH_NUM);
+        }
+
+        return self::$shippingHasRecipientEmailColumn;
     }
 
     /** Cột lưu tổng tiền: total_amount (chuẩn) hoặc total (CSDL cũ). */
@@ -75,7 +103,7 @@ class OrderModel extends BaseModel
 
     /**
      * @param list<array{id:int,qty:int,price:mixed}> $cartItems
-     * @param array{phone?:string,address?:string}    $shipping
+     * @param array{phone?:string,address?:string,recipient_name?:string,recipient_email?:string} $shipping
      */
     public function createFromCart($userId, $cartItems, array $shipping = [])
     {
@@ -140,26 +168,32 @@ class OrderModel extends BaseModel
             }
 
             if ($this->hasShippingTable() && (!empty($shipping['phone']) || !empty($shipping['address']))) {
-                if ($this->shippingHasStatusColumn()) {
-                    $stmtShip = $this->pdo->prepare(
-                        'INSERT INTO shipping (order_id, address, phone, status) VALUES (:order_id, :address, :phone, :status)'
-                    );
-                    $stmtShip->execute([
-                        'order_id' => $orderId,
-                        'address' => trim($shipping['address'] ?? ''),
-                        'phone' => trim($shipping['phone'] ?? ''),
-                        'status' => 'pending',
-                    ]);
-                } else {
-                    $stmtShip = $this->pdo->prepare(
-                        'INSERT INTO shipping (order_id, address, phone) VALUES (:order_id, :address, :phone)'
-                    );
-                    $stmtShip->execute([
-                        'order_id' => $orderId,
-                        'address' => trim($shipping['address'] ?? ''),
-                        'phone' => trim($shipping['phone'] ?? ''),
-                    ]);
+                $cols = ['order_id', 'address', 'phone'];
+                $holders = [':order_id', ':address', ':phone'];
+                $params = [
+                    'order_id' => $orderId,
+                    'address' => trim($shipping['address'] ?? ''),
+                    'phone' => trim($shipping['phone'] ?? ''),
+                ];
+                if ($this->shippingHasRecipientNameColumn()) {
+                    $cols[] = 'recipient_name';
+                    $holders[] = ':recipient_name';
+                    $params['recipient_name'] = trim((string) ($shipping['recipient_name'] ?? ''));
                 }
+                if ($this->shippingHasRecipientEmailColumn()) {
+                    $cols[] = 'recipient_email';
+                    $holders[] = ':recipient_email';
+                    $params['recipient_email'] = trim((string) ($shipping['recipient_email'] ?? ''));
+                }
+                if ($this->shippingHasStatusColumn()) {
+                    $cols[] = 'status';
+                    $holders[] = ':status';
+                    $params['status'] = 'pending';
+                }
+                $stmtShip = $this->pdo->prepare(
+                    'INSERT INTO shipping (' . implode(', ', $cols) . ') VALUES (' . implode(', ', $holders) . ')'
+                );
+                $stmtShip->execute($params);
             }
 
             $this->pdo->commit();
@@ -229,24 +263,85 @@ class OrderModel extends BaseModel
      * - user_name, user_email
      * - ship_phone, ship_address
      */
-    public function allForAdmin(): array
+    public function allForAdmin(string $keyword = ''): array
     {
         $amountCol = $this->ordersAmountColumn();
+        $keyword = trim($keyword);
+        $hasKeyword = $keyword !== '';
+        $like = '%' . $keyword . '%';
 
         if (!$this->hasShippingTable()) {
-            $stmt = $this->pdo->query(
-                "SELECT o.*, o.{$amountCol} AS total_amount, u.name AS user_name, u.email AS user_email
-                 FROM orders o
-                 LEFT JOIN users u ON u.id = o.user_id
-                 ORDER BY o.id DESC"
-            );
+            $sql = "SELECT o.*, o.{$amountCol} AS total_amount, u.name AS user_name, u.email AS user_email
+                    FROM orders o
+                    LEFT JOIN users u ON u.id = o.user_id";
+            if ($hasKeyword) {
+                $sql .= ' WHERE (u.name LIKE :kw OR u.email LIKE :kw)';
+            }
+            $sql .= ' ORDER BY o.id DESC';
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($hasKeyword ? ['kw' => $like] : []);
             return $stmt->fetchAll();
         }
 
-        $stmt = $this->pdo->query(
+        $recipientNameExpr = $this->shippingHasRecipientNameColumn() ? 's.recipient_name' : 'NULL';
+        $recipientEmailExpr = $this->shippingHasRecipientEmailColumn() ? 's.recipient_email' : 'NULL';
+        $sql = "SELECT o.*, o.{$amountCol} AS total_amount,
+                       u.name AS user_name, u.email AS user_email,
+                       s.phone AS ship_phone, s.address AS ship_address,
+                       {$recipientNameExpr} AS ship_recipient_name,
+                       {$recipientEmailExpr} AS ship_recipient_email
+                FROM orders o
+                LEFT JOIN users u ON u.id = o.user_id
+                LEFT JOIN (
+                   SELECT order_id, MAX(id) AS max_id
+                   FROM shipping
+                   GROUP BY order_id
+                ) sm ON sm.order_id = o.id
+                LEFT JOIN shipping s ON s.id = sm.max_id";
+
+        if ($hasKeyword) {
+            $whereParts = [
+                'u.name LIKE :kw',
+                'u.email LIKE :kw',
+            ];
+            if ($this->shippingHasRecipientNameColumn()) {
+                $whereParts[] = 's.recipient_name LIKE :kw';
+            }
+            if ($this->shippingHasRecipientEmailColumn()) {
+                $whereParts[] = 's.recipient_email LIKE :kw';
+            }
+            $sql .= ' WHERE (' . implode(' OR ', $whereParts) . ')';
+        }
+
+        $sql .= ' ORDER BY o.id DESC';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($hasKeyword ? ['kw' => $like] : []);
+        return $stmt->fetchAll();
+    }
+
+    public function findForAdmin(int $orderId)
+    {
+        $amountCol = $this->ordersAmountColumn();
+        if (!$this->hasShippingTable()) {
+            $stmt = $this->pdo->prepare(
+                "SELECT o.*, o.{$amountCol} AS total_amount, u.name AS user_name, u.email AS user_email
+                 FROM orders o
+                 LEFT JOIN users u ON u.id = o.user_id
+                 WHERE o.id = :id LIMIT 1"
+            );
+            $stmt->execute(['id' => $orderId]);
+            return $stmt->fetch();
+        }
+
+        $recipientNameExpr = $this->shippingHasRecipientNameColumn() ? 's.recipient_name' : 'NULL';
+        $recipientEmailExpr = $this->shippingHasRecipientEmailColumn() ? 's.recipient_email' : 'NULL';
+        $stmt = $this->pdo->prepare(
             "SELECT o.*, o.{$amountCol} AS total_amount,
                     u.name AS user_name, u.email AS user_email,
-                    s.phone AS ship_phone, s.address AS ship_address
+                    s.phone AS ship_phone, s.address AS ship_address,
+                    {$recipientNameExpr} AS ship_recipient_name,
+                    {$recipientEmailExpr} AS ship_recipient_email
              FROM orders o
              LEFT JOIN users u ON u.id = o.user_id
              LEFT JOIN (
@@ -255,9 +350,11 @@ class OrderModel extends BaseModel
                 GROUP BY order_id
              ) sm ON sm.order_id = o.id
              LEFT JOIN shipping s ON s.id = sm.max_id
-             ORDER BY o.id DESC"
+             WHERE o.id = :id
+             LIMIT 1"
         );
-        return $stmt->fetchAll();
+        $stmt->execute(['id' => $orderId]);
+        return $stmt->fetch();
     }
 
     public function userCanReviewProduct(int $userId, int $productId): bool

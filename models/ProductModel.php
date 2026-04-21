@@ -4,6 +4,14 @@ class ProductModel extends BaseModel
 {
     protected $table = 'products';
 
+    private function ensureImageColumn(): void
+    {
+        if ($this->productsHasImageColumn()) {
+            return;
+        }
+        $this->pdo->exec('ALTER TABLE products ADD COLUMN image VARCHAR(255) NULL AFTER stock');
+    }
+
     public function allWithCategory($keyword = '', $sort = '', $priceRange = '')
     {
         $sql = 'SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id';
@@ -56,6 +64,7 @@ class ProductModel extends BaseModel
 
     public function create(array $data): bool
     {
+        $this->ensureImageColumn();
         $categoryId = (int) ($data['category_id'] ?? 0);
         $name = trim((string) ($data['name'] ?? ''));
         $description = (string) ($data['description'] ?? '');
@@ -96,6 +105,7 @@ class ProductModel extends BaseModel
 
     public function updateById(int $id, array $data): bool
     {
+        $this->ensureImageColumn();
         $id = (int) $id;
         $categoryId = (int) ($data['category_id'] ?? 0);
         $name = trim((string) ($data['name'] ?? ''));

@@ -12,8 +12,12 @@ foreach ($items as $i) {
                 <input type="hidden" name="product_id" value="<?= (int) $product_id ?>">
             <?php endif; ?>
             <div class="mb-3">
-                <label class="form-label">Họ tên</label>
-                <input type="text" class="form-control" value="<?= htmlspecialchars($user['name'] ?? '') ?>" readonly disabled>
+                <label class="form-label">Người nhận hàng <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="recipient_name" required value="<?= htmlspecialchars($defaultRecipientName ?? ($user['name'] ?? '')) ?>" maxlength="120">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email người nhận</label>
+                <input type="email" class="form-control" name="recipient_email" value="<?= htmlspecialchars($defaultRecipientEmail ?? ($user['email'] ?? '')) ?>" maxlength="150">
             </div>
             <div class="mb-3">
                 <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>

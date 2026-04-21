@@ -31,6 +31,7 @@ match ($action) {
     'admin/products' => (new AdminController())->products(),
     'admin/product-update' => (new AdminController())->updateProduct(),
     'admin/orders' => (new AdminController())->orders(),
+    'admin/order-detail' => (new AdminController())->orderDetail(),
     'admin/order-status' => (new AdminController())->updateOrderStatus(),
     'admin/users' => (new AdminController())->users(),
     'admin/reviews' => (new AdminController())->reviews(),

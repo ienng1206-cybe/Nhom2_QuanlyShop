@@ -17,7 +17,7 @@
                     <h3 class="admin-card-title">Thêm sản phẩm</h3>
                     <p class="admin-card-desc">Chọn danh mục và nhập thông tin cơ bản</p>
                 </div>
-                <form class="admin-form" method="post" action="<?= BASE_URL ?>?action=admin/products">
+                <form class="admin-form" method="post" action="<?= BASE_URL ?>?action=admin/products" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label class="form-label">Danh mục</label>
                         <select class="form-select" name="category_id" required>
@@ -45,8 +45,13 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Link ảnh <span class="text-muted fw-normal">(tùy chọn)</span></label>
+                        <label class="form-label">Link ảnh <span class="text-muted fw-normal"></span></label>
                         <input class="form-control" type="text" name="image" placeholder="https://... ">
+                        <div class="form-text"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tải ảnh sản phẩm</label>
+                        <input class="form-control" type="file" name="image_file" accept="image/png,image/jpeg,image/webp,image/gif">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Mô tả</label>
@@ -62,7 +67,7 @@
                         <h3 class="admin-card-title">Sửa sản phẩm #<?= (int) $editingProduct['id'] ?></h3>
                         <p class="admin-card-desc">Cập nhật và lưu thay đổi</p>
                     </div>
-                    <form class="admin-form" method="post" action="<?= BASE_URL ?>?action=admin/product-update">
+                    <form class="admin-form" method="post" action="<?= BASE_URL ?>?action=admin/product-update" enctype="multipart/form-data">
                         <input type="hidden" name="id" value="<?= (int) $editingProduct['id'] ?>">
                         <div class="mb-3">
                             <label class="form-label">Danh mục</label>
@@ -92,6 +97,15 @@
                         <div class="mb-3">
                             <label class="form-label">Link ảnh</label>
                             <input class="form-control" type="text" name="image" value="<?= htmlspecialchars((string) ($editingProduct['image'] ?? '')) ?>">
+                            <div class="form-text">Có thể nhập link mới hoặc tải ảnh mới từ máy. Giá trị hiện tại: <code><?= htmlspecialchars((string) ($editingProduct['image'] ?? '')) ?></code></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tải ảnh mới</label>
+                            <input class="form-control" type="file" name="image_file" accept="image/png,image/jpeg,image/webp,image/gif">
+                            <?php $editImg = product_image_url((string) ($editingProduct['image'] ?? '')); ?>
+                            <?php if ($editImg !== ''): ?>
+                                <img src="<?= htmlspecialchars($editImg) ?>" alt="" class="admin-product-thumb mt-2">
+                            <?php endif; ?>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mô tả</label>
@@ -121,6 +135,7 @@
                             <thead>
                                 <tr>
                                     <th style="width:90px;">ID</th>
+                                    <th style="width:84px;">Ảnh</th>
                                     <th>Tên</th>
                                     <th style="width:140px;">Giá</th>
                                     <th style="width:110px;">Tồn</th>
@@ -131,6 +146,14 @@
                                 <?php foreach ($products as $p): ?>
                                     <tr>
                                         <td class="fw-semibold"><?= (int) $p['id'] ?></td>
+                                        <td>
+                                            <?php $thumb = product_image_url((string) ($p['image'] ?? '')); ?>
+                                            <?php if ($thumb !== ''): ?>
+                                                <img src="<?= htmlspecialchars($thumb) ?>" alt="" class="admin-product-thumb">
+                                            <?php else: ?>
+                                                <span class="text-secondary small">Chưa có ảnh</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td><?= htmlspecialchars((string) ($p['name'] ?? '')) ?></td>
                                         <td><?= number_format((float) ($p['price'] ?? 0)) ?> đ</td>
                                         <td><?= (int) ($p['stock'] ?? 0) ?></td>

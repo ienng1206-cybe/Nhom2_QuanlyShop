@@ -2,6 +2,32 @@
 
 class AdminController extends BaseController
 {
+    private function uploadProductImage(array $file): ?string
+    {
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+            throw new RuntimeException('Tải ảnh lên thất bại.');
+        }
+        $size = (int) ($file['size'] ?? 0);
+        if ($size <= 0 || $size > 4 * 1024 * 1024) {
+            throw new RuntimeException('Ảnh phải nhỏ hơn 4MB.');
+        }
+
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        $mime = mime_content_type((string) ($file['tmp_name'] ?? ''));
+        $ext = strtolower((string) pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
+        $mimeOk = is_string($mime) && in_array($mime, $allowedMimes, true);
+        $extOk = in_array($ext, $allowedExts, true);
+        if (!$mimeOk && !$extOk) {
+            throw new RuntimeException('Chỉ hỗ trợ ảnh JPG, PNG, WEBP, GIF.');
+        }
+
+        return upload_file('products', $file);
+    }
+
     /** Layout riêng views/admin/layout.php — không dùng main.php (cửa hàng). */
     private function renderAdminPage(string $viewName, array $data): void
     {
@@ -89,10 +115,14 @@ class AdminController extends BaseController
                 $_SESSION['error'] = 'Vui lòng chọn danh mục và nhập tên sản phẩm.';
             } else {
                 try {
+                    $uploadedImage = $this->uploadProductImage($_FILES['image_file'] ?? []);
+                    if ($uploadedImage !== null) {
+                        $data['image'] = $uploadedImage;
+                    }
                     $ok = (new ProductModel())->create($data);
                     $_SESSION[$ok ? 'success' : 'error'] = $ok ? 'Đã thêm sản phẩm thành công.' : 'Không thể thêm sản phẩm.';
                 } catch (Throwable $e) {
-                    $_SESSION['error'] = 'Lỗi khi thêm sản phẩm. Kiểm tra danh mục có tồn tại và cấu trúc bảng products.';
+                    $_SESSION['error'] = 'Lỗi khi thêm sản phẩm: ' . $e->getMessage();
                 }
             }
 
@@ -131,10 +161,14 @@ class AdminController extends BaseController
         ];
 
         try {
+            $uploadedImage = $this->uploadProductImage($_FILES['image_file'] ?? []);
+            if ($uploadedImage !== null) {
+                $data['image'] = $uploadedImage;
+            }
             $ok = (new ProductModel())->updateById($id, $data);
             $_SESSION[$ok ? 'success' : 'error'] = $ok ? 'Đã cập nhật sản phẩm #' . $id . '.' : 'Không thể cập nhật sản phẩm.';
         } catch (Throwable $e) {
-            $_SESSION['error'] = 'Lỗi khi cập nhật sản phẩm.';
+            $_SESSION['error'] = 'Lỗi khi cập nhật sản phẩm: ' . $e->getMessage();
         }
 
         redirect('admin/products');
@@ -144,9 +178,10 @@ class AdminController extends BaseController
     {
         require_admin();
 
+        $keyword = trim((string) ($_GET['keyword'] ?? ''));
         $orders = [];
         try {
-            $orders = (new OrderModel())->allForAdmin();
+            $orders = (new OrderModel())->allForAdmin($keyword);
         } catch (Throwable $e) {
             $orders = [];
         }
@@ -154,6 +189,7 @@ class AdminController extends BaseController
         $this->renderAdminPage('admin/orders', [
             'title' => 'Đơn hàng',
             'orders' => $orders,
+            'keyword' => $keyword,
         ]);
     }
 
@@ -163,12 +199,41 @@ class AdminController extends BaseController
 
         $id = (int) ($_POST['id'] ?? 0);
         $status = $_POST['status'] ?? 'pending';
+        $keyword = trim((string) ($_POST['keyword'] ?? ''));
         if ($id > 0) {
             $ok = (new OrderModel())->updateStatus($id, $status);
             $_SESSION[$ok ? 'success' : 'error'] = $ok ? 'Đã cập nhật trạng thái đơn hàng #' . $id . '.' : 'Không cập nhật được trạng thái.';
         }
 
-        redirect('admin/orders');
+        $next = 'admin/orders';
+        if ($keyword !== '') {
+            $next .= '&keyword=' . urlencode($keyword);
+        }
+        redirect($next);
+    }
+
+    public function orderDetail()
+    {
+        require_admin();
+
+        $id = (int) ($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            $_SESSION['error'] = 'Mã đơn hàng không hợp lệ.';
+            redirect('admin/orders');
+        }
+
+        $orderModel = new OrderModel();
+        $order = $orderModel->findForAdmin($id);
+        if (!$order) {
+            $_SESSION['error'] = 'Không tìm thấy đơn hàng.';
+            redirect('admin/orders');
+        }
+
+        $this->renderAdminPage('admin/order_detail', [
+            'title' => 'Chi tiết đơn #' . $id,
+            'order' => $order,
+            'items' => $orderModel->getOrderItems($id),
+        ]);
     }
 
     public function users()
