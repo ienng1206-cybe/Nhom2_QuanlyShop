@@ -214,6 +214,52 @@ class OrderModel extends BaseModel
         return $stmt->fetchAll();
     }
 
+    /** Đếm số đơn đã hủy của user (status=cancelled). */
+    public function countCancelledByUser(int $userId): int
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM orders WHERE user_id = :uid AND status = 'cancelled'");
+        $stmt->execute(['uid' => $userId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Danh sách đơn hàng cho admin: kèm thông tin user + địa chỉ giao hàng (nếu có bảng shipping).
+     * Trả về list orders có thêm các key:
+     * - user_name, user_email
+     * - ship_phone, ship_address
+     */
+    public function allForAdmin(): array
+    {
+        $amountCol = $this->ordersAmountColumn();
+
+        if (!$this->hasShippingTable()) {
+            $stmt = $this->pdo->query(
+                "SELECT o.*, o.{$amountCol} AS total_amount, u.name AS user_name, u.email AS user_email
+                 FROM orders o
+                 LEFT JOIN users u ON u.id = o.user_id
+                 ORDER BY o.id DESC"
+            );
+            return $stmt->fetchAll();
+        }
+
+        $stmt = $this->pdo->query(
+            "SELECT o.*, o.{$amountCol} AS total_amount,
+                    u.name AS user_name, u.email AS user_email,
+                    s.phone AS ship_phone, s.address AS ship_address
+             FROM orders o
+             LEFT JOIN users u ON u.id = o.user_id
+             LEFT JOIN (
+                SELECT order_id, MAX(id) AS max_id
+                FROM shipping
+                GROUP BY order_id
+             ) sm ON sm.order_id = o.id
+             LEFT JOIN shipping s ON s.id = sm.max_id
+             ORDER BY o.id DESC"
+        );
+        return $stmt->fetchAll();
+    }
+
     public function userCanReviewProduct(int $userId, int $productId): bool
     {
         $stmt = $this->pdo->prepare(

@@ -3,7 +3,16 @@
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 
-define('BASE_URL', 'http://localhost/D%e1%bb%b1%20%c3%a1n%201/Nhom2_QuanlyShop/');
+if (!defined('BASE_URL')) {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
+    $basePath = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+    if ($basePath === '' || $basePath === '.') {
+        $basePath = '';
+    }
+    define('BASE_URL', $scheme . '://' . $host . $basePath . '/');
+}
 
 define('PATH_ROOT', __DIR__ . '/../');
 define('PATH_VIEW', PATH_ROOT . 'views/');
@@ -17,7 +26,7 @@ define('PATH_MODEL', PATH_ROOT . 'models/');
 define('DB_HOST', 'localhost');
 define('DB_PORT', '3306');
 define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
+define('DB_PASSWORD', 'admin');
 define('DB_NAME', 'nhom2_quanlyshop');
 define('DB_CHARSET', 'utf8mb4');
 

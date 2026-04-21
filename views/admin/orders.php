@@ -24,7 +24,8 @@
                     <thead>
                         <tr>
                             <th style="width:90px;">#</th>
-                            <th style="width:140px;">Khách (ID)</th>
+                            <th style="width:220px;">Khách</th>
+                            <th style="min-width:260px;">Giao hàng</th>
                             <th style="width:170px;">Tổng tiền</th>
                             <th style="width:160px;">Trạng thái</th>
                             <th style="min-width:220px;">Cập nhật</th>
@@ -36,7 +37,25 @@
                             <?php $rawSt = (string) ($o['status'] ?? ''); ?>
                             <tr>
                                 <td class="fw-semibold"><?= (int) ($o['id'] ?? 0) ?></td>
-                                <td><?= (int) ($o['user_id'] ?? 0) ?></td>
+                                <td>
+                                    <div class="fw-semibold"><?= htmlspecialchars((string) ($o['user_name'] ?? '')) ?></div>
+                                    <div class="text-secondary small">
+                                        #<?= (int) ($o['user_id'] ?? 0) ?>
+                                        <?php if (!empty($o['user_email'])): ?>
+                                            · <?= htmlspecialchars((string) $o['user_email']) ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <?php $shipPhone = trim((string) ($o['ship_phone'] ?? '')); ?>
+                                    <?php $shipAddr = trim((string) ($o['ship_address'] ?? '')); ?>
+                                    <?php if ($shipPhone !== '' || $shipAddr !== ''): ?>
+                                        <div class="fw-semibold"><?= htmlspecialchars($shipPhone) ?></div>
+                                        <div class="text-secondary small"><?= htmlspecialchars($shipAddr) ?></div>
+                                    <?php else: ?>
+                                        <span class="text-secondary small">—</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?= number_format(order_total_amount($o)) ?> đ</td>
                                 <td>
                                     <?php $badgeClass = preg_replace('/[^a-z]/', '', $rawSt); ?>

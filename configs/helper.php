@@ -25,7 +25,9 @@ if (!function_exists('upload_file')) {
 if (!function_exists('redirect')) {
     function redirect($action = '/')
     {
-        header('Location: ' . BASE_URL . '?action=' . urlencode($action));
+        // Không urlencode toàn bộ $action vì sẽ làm hỏng route dạng "product/index" và query "order/detail&id=1".
+        $action = (string) $action;
+        header('Location: ' . BASE_URL . '?action=' . $action);
         exit;
     }
 }
@@ -72,7 +74,13 @@ if (!function_exists('product_image_url')) {
             return $image;
         }
 
-        return BASE_ASSETS_UPLOADS . ltrim($image, '/');
+        // Hỗ trợ cả trường hợp lưu sẵn "assets/uploads/xxx.jpg"
+        $image = ltrim($image, '/');
+        if (str_starts_with($image, 'assets/uploads/')) {
+            return BASE_URL . $image;
+        }
+
+        return BASE_ASSETS_UPLOADS . $image;
     }
 }
 

@@ -8,8 +8,13 @@ class AuthController extends BaseController
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
 
-            $userModel = new UserModel();
-            $user = $userModel->findByEmail($email);
+            try {
+                $userModel = new UserModel();
+                $user = $userModel->findByEmail($email);
+            } catch (Throwable $e) {
+                $_SESSION['error'] = 'Không thể đăng nhập lúc này (lỗi CSDL/bảng users). Hãy import schema/migrate và thử lại.';
+                redirect('auth/login');
+            }
 
             if ($user && password_verify($password, $user['password'])) {
                 // Kiểm tra tài khoản có bị khóa không
@@ -44,15 +49,20 @@ class AuthController extends BaseController
                 redirect('auth/register');
             }
 
-            $userModel = new UserModel();
-            if ($userModel->findByEmail($email)) {
-                $_SESSION['error'] = 'Email đã tồn tại.';
+            try {
+                $userModel = new UserModel();
+                if ($userModel->findByEmail($email)) {
+                    $_SESSION['error'] = 'Email đã tồn tại.';
+                    redirect('auth/register');
+                }
+
+                $userModel->create($name, $email, $password, 'client');
+                $_SESSION['success'] = 'Đăng ký thành công. Vui lòng đăng nhập.';
+                redirect('auth/login');
+            } catch (Throwable $e) {
+                $_SESSION['error'] = 'Không thể đăng ký lúc này (lỗi CSDL/bảng users). Hãy import schema/migrate và thử lại.';
                 redirect('auth/register');
             }
-
-            $userModel->create($name, $email, $password, 'client');
-            $_SESSION['success'] = 'Đăng ký thành công. Vui lòng đăng nhập.';
-            redirect('auth/login');
         }
 
         $this->render('auth/register', [
