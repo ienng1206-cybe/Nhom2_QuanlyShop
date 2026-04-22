@@ -360,7 +360,7 @@ class OrderModel extends BaseModel
     public function userCanReviewProduct(int $userId, int $productId): bool
     {
         $stmt = $this->pdo->prepare(
-            'SELECT 1, o.created_at
+            'SELECT 1
             FROM orders o
             JOIN order_items oi ON oi.order_id = o.id
             LEFT JOIN reviews r ON r.user_id = o.user_id AND r.product_id = oi.product_id
@@ -368,7 +368,7 @@ class OrderModel extends BaseModel
               AND oi.product_id = :product_id
               AND (
                 o.status IN ("completed", "delivered")
-                OR (o.status = "pending" AND o.created_at < DATE_SUB(NOW(), INTERVAL 240 SECOND))
+                OR (o.status = "pending" AND TIMESTAMPDIFF(SECOND, o.created_at, NOW()) >= 240)
               )
               AND r.id IS NULL
             LIMIT 1'

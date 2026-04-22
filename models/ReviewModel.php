@@ -30,17 +30,18 @@ class ReviewModel extends BaseModel
         return $stmt->fetchAll();
     }
 
-    public function create($userId, $productId, $rating, $comment)
+    public function create($userId, $productId, $rating, $comment, $image = null)
     {
         $stmt = $this->pdo->prepare(
-            'INSERT INTO reviews(user_id, product_id, rating, comment, created_at)
-            VALUES (:user_id, :product_id, :rating, :comment, NOW())'
+            'INSERT INTO reviews(user_id, product_id, rating, comment, image, created_at)
+            VALUES (:user_id, :product_id, :rating, :comment, :image, NOW())'
         );
         return $stmt->execute([
             'user_id' => $userId,
             'product_id' => $productId,
             'rating' => $rating,
             'comment' => $comment,
+            'image' => $image,
         ]);
     }
 }

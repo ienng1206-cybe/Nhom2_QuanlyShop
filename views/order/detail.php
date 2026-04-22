@@ -73,7 +73,7 @@
                 <?php endif; ?>
                 <div class="card p-3 mb-3">
                     <h5 class="mb-3"><?= htmlspecialchars($item['name']) ?></h5>
-                    <form method="post" action="<?= BASE_URL ?>?action=review/store">
+                    <form method="post" action="<?= BASE_URL ?>?action=review/store" enctype="multipart/form-data">
                         <input type="hidden" name="product_id" value="<?= $productId ?>">
                         <div class="mb-3">
                             <label class="form-label">Điểm đánh giá</label>
@@ -86,6 +86,11 @@
                         <div class="mb-3">
                             <label class="form-label">Nhận xét</label>
                             <textarea class="form-control" name="comment" rows="3" required placeholder="Viết nhận xét..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hình ảnh (tùy chọn)</label>
+                            <input type="file" class="form-control" name="review_image" accept="image/jpeg,image/png,image/gif" title="Chọn file ảnh (JPG, PNG, GIF - Max 5MB)">
+                            <small class="text-muted d-block mt-1">Định dạng: JPG, PNG, GIF | Dung lượng tối đa: 5MB</small>
                         </div>
                         <button class="btn btn-primary" type="submit">Gửi đánh giá</button>
                     </form>
