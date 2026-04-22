@@ -50,10 +50,13 @@
 
     <?php
         $hasReviewForms = false;
-        foreach ($items as $item) {
-            if (!empty($canReviewProducts[$item['product_id'] ?? 0])) {
-                $hasReviewForms = true;
-                break;
+        $effectiveStatus = order_effective_status($order['status'] ?? '', $order['created_at'] ?? null);
+        if ($effectiveStatus === 'delivered') {
+            foreach ($items as $item) {
+                if (!empty($canReviewProducts[$item['product_id'] ?? 0])) {
+                    $hasReviewForms = true;
+                    break;
+                }
             }
         }
     ?>

@@ -9,24 +9,14 @@ class OrderController extends BaseController
         $cartModel = new CartModel();
         $productId = (int) ($_GET['product_id'] ?? 0);
         if ($productId > 0) {
-            try {
-                $item = $cartModel->getItem($userId, $productId);
-            } catch (Throwable $e) {
-                $_SESSION['error'] = 'Không thể lấy sản phẩm từ giỏ (thiếu bảng carts/cart_items hoặc lỗi CSDL).';
-                redirect('cart/index');
-            }
+            $item = $cartModel->getItem($userId, $productId);
             if (!$item) {
                 $_SESSION['error'] = 'Sản phẩm không có trong giỏ hàng.';
                 redirect('cart/index');
             }
             $items = [$item];
         } else {
-            try {
-                $items = $cartModel->get($userId);
-            } catch (Throwable $e) {
-                $_SESSION['error'] = 'Không thể mở thanh toán (thiếu bảng carts/cart_items hoặc lỗi CSDL).';
-                redirect('cart/index');
-            }
+            $items = $cartModel->get($userId);
             if (empty($items)) {
                 $_SESSION['error'] = 'Giỏ hàng đang trống.';
                 redirect('cart/index');
@@ -38,8 +28,6 @@ class OrderController extends BaseController
             'view' => 'order/checkout',
             'items' => $items,
             'user' => current_user(),
-            'defaultRecipientName' => (string) (current_user()['name'] ?? ''),
-            'defaultRecipientEmail' => (string) (current_user()['email'] ?? ''),
             'product_id' => $productId,
         ]);
     }
@@ -53,37 +41,19 @@ class OrderController extends BaseController
 
         $phone = trim($_POST['phone'] ?? '');
         $address = trim($_POST['address'] ?? '');
-        $recipientName = trim($_POST['recipient_name'] ?? '');
-        $recipientEmail = trim($_POST['recipient_email'] ?? '');
         if ($phone === '' || $address === '') {
             $_SESSION['error'] = 'Vui lòng nhập đầy đủ số điện thoại và địa chỉ giao hàng.';
             redirect('order/checkout');
-        }
-        if ($recipientName === '') {
-            $recipientName = (string) (current_user()['name'] ?? '');
-        }
-        if ($recipientEmail === '') {
-            $recipientEmail = (string) (current_user()['email'] ?? '');
         }
 
         $userId = (int) current_user()['id'];
         $cartModel = new CartModel();
         $productId = (int) ($_POST['product_id'] ?? 0);
         if ($productId > 0) {
-            try {
-                $item = $cartModel->getItem($userId, $productId);
-            } catch (Throwable $e) {
-                $_SESSION['error'] = 'Không thể tạo đơn (lỗi giỏ hàng/CSDL).';
-                redirect('cart/index');
-            }
+            $item = $cartModel->getItem($userId, $productId);
             $items = $item ? [$item] : [];
         } else {
-            try {
-                $items = $cartModel->get($userId);
-            } catch (Throwable $e) {
-                $_SESSION['error'] = 'Không thể tạo đơn (lỗi giỏ hàng/CSDL).';
-                redirect('cart/index');
-            }
+            $items = $cartModel->get($userId);
         }
         if (empty($items)) {
             $_SESSION['error'] = 'Giỏ hàng đang trống.';
@@ -95,8 +65,6 @@ class OrderController extends BaseController
             $orderId = $orderModel->createFromCart($userId, $items, [
                 'phone' => $phone,
                 'address' => $address,
-                'recipient_name' => $recipientName,
-                'recipient_email' => $recipientEmail,
             ]);
             if ($orderId) {
                 if ($productId > 0) {
@@ -128,23 +96,13 @@ class OrderController extends BaseController
         $id = (int) ($_GET['id'] ?? 0);
         $userId = (int) current_user()['id'];
         $orderModel = new OrderModel();
-        try {
-            $order = $orderModel->findForUser($id, $userId);
-        } catch (Throwable $e) {
-            $_SESSION['error'] = 'Không thể tải đơn hàng (thiếu bảng orders/order_items hoặc lỗi CSDL).';
-            redirect('order/my');
-        }
+        $order = $orderModel->findForUser($id, $userId);
         if (!$order) {
             $_SESSION['error'] = 'Không tìm thấy đơn hàng.';
             redirect('order/my');
         }
 
-        try {
-            $items = $orderModel->getOrderItems($id);
-        } catch (Throwable $e) {
-            $_SESSION['error'] = 'Không thể tải chi tiết sản phẩm trong đơn (lỗi CSDL).';
-            redirect('order/my');
-        }
+        $items = $orderModel->getOrderItems($id);
         $canReviewProducts = [];
         foreach ($items as $item) {
             $productId = (int) ($item['product_id'] ?? 0);
@@ -177,24 +135,10 @@ class OrderController extends BaseController
         }
 
         try {
-            $userId = (int) current_user()['id'];
-            $orderModel = new OrderModel();
-            $ok = $orderModel->cancelForUser($id, $userId);
-            if ($ok) {
-                // Khóa tài khoản nếu hủy quá nhiều.
-                $maxCancels = 3;
-                $cancelCount = $orderModel->countCancelledByUser($userId);
-                if ($cancelCount >= $maxCancels) {
-                    (new UserModel())->setLockStatus($userId, true);
-                    unset($_SESSION['user']);
-                    $_SESSION['error'] = 'Tài khoản đã bị khóa do hủy đơn quá nhiều lần. Vui lòng liên hệ quản trị viên.';
-                    redirect('auth/login');
-                }
-
-                $_SESSION['success'] = 'Đã hủy đơn hàng #' . $id . '.';
-            } else {
-                $_SESSION['error'] = 'Không thể hủy đơn (chỉ hủy được đơn đang chờ xử lý, trong vòng 5 phút sau khi đặt).';
-            }
+            $ok = (new OrderModel())->cancelForUser($id, (int) current_user()['id']);
+            $_SESSION[$ok ? 'success' : 'error'] = $ok
+                ? 'Đã hủy đơn hàng #' . $id . '.'
+                : 'Không thể hủy đơn (chỉ hủy được đơn đang chờ xử lý, trong vòng 5 phút sau khi đặt).';
         } catch (Throwable $e) {
             $_SESSION['error'] = 'Không thể hủy đơn hàng lúc này.';
         }
@@ -205,12 +149,7 @@ class OrderController extends BaseController
     public function myOrders()
     {
         require_login();
-        try {
-            $orders = (new OrderModel())->getByUser((int) current_user()['id']);
-        } catch (Throwable $e) {
-            $_SESSION['error'] = 'Không thể tải danh sách đơn hàng (thiếu bảng orders hoặc lỗi CSDL).';
-            $orders = [];
-        }
+        $orders = (new OrderModel())->getByUser((int) current_user()['id']);
         $this->render('order/my', [
             'title' => 'Đơn hàng của tôi',
             'view' => 'order/my',
