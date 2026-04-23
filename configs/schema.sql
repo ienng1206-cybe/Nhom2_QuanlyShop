@@ -105,6 +105,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     product_id INT,
     rating INT DEFAULT 5,
     comment TEXT,
+    image VARCHAR(255) NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE

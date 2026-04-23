@@ -104,10 +104,15 @@ class OrderController extends BaseController
 
         $items = $orderModel->getOrderItems($id);
         $canReviewProducts = [];
+        $productReviews = [];
+        $reviewModel = new ReviewModel();
+        
         foreach ($items as $item) {
             $productId = (int) ($item['product_id'] ?? 0);
             if ($productId > 0) {
                 $canReviewProducts[$productId] = $orderModel->userCanReviewProduct($userId, $productId);
+                // Lấy danh sách review cho từng sản phẩm
+                $productReviews[$productId] = $reviewModel->getByProduct($productId);
             }
         }
 
@@ -118,6 +123,7 @@ class OrderController extends BaseController
             'items' => $items,
             'shipping' => $orderModel->getShipping($id),
             'canReviewProducts' => $canReviewProducts,
+            'productReviews' => $productReviews,
         ]);
     }
 

@@ -61,18 +61,67 @@
         }
     ?>
 
-    <?php if ($hasReviewForms): ?>
-        <div class="search-panel mb-4">
-            <h3 class="h6 fw-bold mb-3">Đánh giá sản phẩm</h3>
-            <p class="text-muted mb-3">Đơn hàng đã giao, bạn có thể đánh giá các sản phẩm trong đơn này.</p>
+    <!-- Phần hiển thị đánh giá từ khách hàng khác -->
+    <?php foreach ($items as $item): ?>
+        <?php $productId = (int) ($item['product_id'] ?? 0); ?>
+        <?php $reviews = $productReviews[$productId] ?? []; ?>
+        <?php if (!empty($reviews)): ?>
+            <div class="search-panel mb-4">
+                <h3 class="h6 fw-bold mb-3">Đánh giá của khách hàng khác - <?= htmlspecialchars($item['name']) ?></h3>
+                <div class="row g-3">
+                    <?php foreach ($reviews as $review): ?>
+                        <div class="col-12">
+                            <div class="card review-card shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted small mb-2">
+                                                <strong><?= htmlspecialchars($review['user_name'] ?? 'Người dùng') ?></strong>
+                                                <?php if (!empty($review['created_at'])): ?>
+                                                    · <span><?= date('d/m/Y H:i', strtotime($review['created_at'])) ?></span>
+                                                <?php endif; ?>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-star-fill me-1"></i><?= (int) ($review['rating'] ?? 5) ?>/5
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="card-text">
+                                        <p class="mb-2"><?= nl2br(htmlspecialchars($review['comment'] ?? '')) ?></p>
+                                        <?php if (!empty($review['image'])): ?>
+                                            <img src="<?= BASE_URL . $review['image'] ?>" alt="Review image" class="img-fluid rounded mt-2" style="max-width: 300px; max-height: 300px;">
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
 
-            <?php foreach ($items as $item): ?>
-                <?php $productId = (int) ($item['product_id'] ?? 0); ?>
-                <?php if (empty($canReviewProducts[$productId])): ?>
-                    <?php continue; ?>
-                <?php endif; ?>
-                <div class="card p-3 mb-3">
-                    <h5 class="mb-3"><?= htmlspecialchars($item['name']) ?></h5>
+    <!-- Phần đánh giá sản phẩm -->
+    <div class="search-panel mb-4">
+        <h3 class="h6 fw-bold mb-3">Đánh giá sản phẩm</h3>
+        
+        <p class="text-muted mb-3">Chia sẻ trải nghiệm của bạn về các sản phẩm trong đơn hàng này.</p>
+
+        <?php foreach ($items as $item): ?>
+            <?php $productId = (int) ($item['product_id'] ?? 0); ?>
+            <?php $canReview = !empty($canReviewProducts[$productId]); ?>
+            
+            <div class="card p-3 mb-3">
+                <h5 class="mb-3"><?= htmlspecialchars($item['name']) ?></h5>
+                
+                <?php if (!$canReview): ?>
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Bạn đã đánh giá sản phẩm này rồi.
+                    </div>
+                <?php else: ?>
                     <form method="post" action="<?= BASE_URL ?>?action=review/store" enctype="multipart/form-data">
                         <input type="hidden" name="product_id" value="<?= $productId ?>">
                         <div class="mb-3">
@@ -94,10 +143,10 @@
                         </div>
                         <button class="btn btn-primary" type="submit">Gửi đánh giá</button>
                     </form>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
 
     <a class="btn btn-outline-primary" href="<?= BASE_URL ?>?action=order/my">← Danh sách đơn hàng</a>
 </div>
