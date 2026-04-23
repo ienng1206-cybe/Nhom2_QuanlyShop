@@ -19,4 +19,3 @@ if (!function_exists('db_connect')) {
         return $pdo;
     }
 }
-
