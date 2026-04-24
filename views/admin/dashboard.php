@@ -19,36 +19,66 @@
         </div>
     </div>
 
+    <?php
+    $orderStats = [
+        'cancelled' => 0,
+        'processing' => 0,
+        'shipping' => 0,
+        'delivered' => 0,
+        'pending' => 0,
+    ];
+    foreach (($orders ?? []) as $order) {
+        $status = (string) ($order['status'] ?? 'pending');
+        if ($status === 'completed') {
+            $status = 'delivered';
+        }
+        if (!array_key_exists($status, $orderStats)) {
+            $status = 'pending';
+        }
+        $orderStats[$status]++;
+    }
+    ?>
+
     <div class="row g-3 mb-4" id="admin-stats">
         <div class="col-6 col-xl">
-            <div class="admin-stat-card admin-stat-card--users">
-                <span class="admin-stat-value"><?= count($users ?? []) ?></span>
-                <span class="admin-stat-label">Người dùng</span>
-            </div>
+            <a class="admin-stat-link" href="<?= BASE_URL ?>?action=admin/orders&status=cancelled">
+                <div class="admin-stat-card admin-stat-card--cancelled">
+                <span class="admin-stat-value"><?= $orderStats['cancelled'] ?></span>
+                <span class="admin-stat-label">Đơn hàng hủy</span>
+                </div>
+            </a>
         </div>
         <div class="col-6 col-xl">
-            <div class="admin-stat-card admin-stat-card--categories">
-                <span class="admin-stat-value"><?= count($categories ?? []) ?></span>
-                <span class="admin-stat-label">Danh mục</span>
-            </div>
+            <a class="admin-stat-link" href="<?= BASE_URL ?>?action=admin/orders&status=processing">
+                <div class="admin-stat-card admin-stat-card--processing">
+                <span class="admin-stat-value"><?= $orderStats['processing'] ?></span>
+                <span class="admin-stat-label">Đang xử lý</span>
+                </div>
+            </a>
         </div>
         <div class="col-6 col-xl">
-            <div class="admin-stat-card admin-stat-card--products">
-                <span class="admin-stat-value"><?= count($products ?? []) ?></span>
-                <span class="admin-stat-label">Sản phẩm</span>
-            </div>
+            <a class="admin-stat-link" href="<?= BASE_URL ?>?action=admin/orders&status=shipping">
+                <div class="admin-stat-card admin-stat-card--shipping">
+                <span class="admin-stat-value"><?= $orderStats['shipping'] ?></span>
+                <span class="admin-stat-label">Đang giao</span>
+                </div>
+            </a>
         </div>
         <div class="col-6 col-xl">
-            <div class="admin-stat-card admin-stat-card--orders">
-                <span class="admin-stat-value"><?= count($orders ?? []) ?></span>
-                <span class="admin-stat-label">Đơn hàng</span>
-            </div>
+            <a class="admin-stat-link" href="<?= BASE_URL ?>?action=admin/orders&status=delivered">
+                <div class="admin-stat-card admin-stat-card--delivered">
+                <span class="admin-stat-value"><?= $orderStats['delivered'] ?></span>
+                <span class="admin-stat-label">Đã giao</span>
+                </div>
+            </a>
         </div>
         <div class="col-6 col-xl">
-            <div class="admin-stat-card admin-stat-card--reviews">
-                <span class="admin-stat-value"><?= count($reviews ?? []) ?></span>
-                <span class="admin-stat-label">Đánh giá</span>
-            </div>
+            <a class="admin-stat-link" href="<?= BASE_URL ?>?action=admin/orders&status=pending">
+                <div class="admin-stat-card admin-stat-card--pending">
+                <span class="admin-stat-value"><?= $orderStats['pending'] ?></span>
+                <span class="admin-stat-label">Chờ xử lý</span>
+                </div>
+            </a>
         </div>
     </div>
 
@@ -57,7 +87,7 @@
             <div class="admin-card h-100">
                 <div class="admin-card-header">
                     <h3 class="admin-card-title">Danh mục</h3>
-                    <p class="admin-card-desc">Tạo / xóa / xem danh mục</p>
+                    <p class="admin-card-desc"></p>
                 </div>
                 <a class="btn btn-primary w-100" href="<?= BASE_URL ?>?action=admin/categories">Quản lý danh mục →</a>
             </div>
@@ -66,7 +96,7 @@
             <div class="admin-card h-100">
                 <div class="admin-card-header">
                     <h3 class="admin-card-title">Sản phẩm</h3>
-                    <p class="admin-card-desc">Thêm / sửa / xóa sản phẩm</p>
+                    <p class="admin-card-desc"></p>
                 </div>
                 <a class="btn btn-success w-100" href="<?= BASE_URL ?>?action=admin/products">Quản lý sản phẩm →</a>
             </div>
@@ -75,7 +105,7 @@
             <div class="admin-card h-100">
                 <div class="admin-card-header">
                     <h3 class="admin-card-title">Đơn hàng</h3>
-                    <p class="admin-card-desc">Theo dõi và cập nhật trạng thái</p>
+                    <p class="admin-card-desc"></p>
                 </div>
                 <a class="btn btn-outline-light w-100" href="<?= BASE_URL ?>?action=admin/orders">Quản lý đơn hàng →</a>
             </div>
@@ -84,7 +114,7 @@
             <div class="admin-card h-100">
                 <div class="admin-card-header">
                     <h3 class="admin-card-title">Người dùng</h3>
-                    <p class="admin-card-desc">Danh sách tài khoản và vai trò</p>
+                    <p class="admin-card-desc"></p>
                 </div>
                 <a class="btn btn-outline-secondary w-100" href="<?= BASE_URL ?>?action=admin/users">Quản lý người dùng →</a>
             </div>
@@ -93,7 +123,7 @@
             <div class="admin-card h-100">
                 <div class="admin-card-header">
                     <h3 class="admin-card-title">Đánh giá</h3>
-                    <p class="admin-card-desc">Xem / xóa đánh giá sản phẩm</p>
+                    <p class="admin-card-desc"></p>
                 </div>
                 <a class="btn btn-outline-secondary w-100" href="<?= BASE_URL ?>?action=admin/reviews">Quản lý đánh giá →</a>
             </div>

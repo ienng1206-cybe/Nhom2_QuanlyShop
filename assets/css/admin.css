@@ -201,6 +201,12 @@
     border-left: 4px solid var(--stat-accent, #64748b);
 }
 
+.admin-stat-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 .admin-stat-value {
     display: block;
     font-size: 1.65rem;
@@ -216,24 +222,24 @@
     font-weight: 600;
 }
 
-.admin-stat-card--users {
-    --stat-accent: #818cf8;
+.admin-stat-card--cancelled {
+    --stat-accent: #f87171;
 }
 
-.admin-stat-card--categories {
+.admin-stat-card--processing {
     --stat-accent: #a78bfa;
 }
 
-.admin-stat-card--products {
+.admin-stat-card--shipping {
     --stat-accent: #38bdf8;
 }
 
-.admin-stat-card--orders {
-    --stat-accent: #fbbf24;
+.admin-stat-card--delivered {
+    --stat-accent: #34d399;
 }
 
-.admin-stat-card--reviews {
-    --stat-accent: #34d399;
+.admin-stat-card--pending {
+    --stat-accent: #fbbf24;
 }
 
 .admin-card {
@@ -365,7 +371,17 @@
     color: #7dd3fc;
 }
 
+.admin-badge-status--shipping {
+    background: rgba(125, 211, 252, 0.2);
+    color: #bae6fd;
+}
+
 .admin-badge-status--completed {
+    background: rgba(52, 211, 153, 0.15);
+    color: #6ee7b7;
+}
+
+.admin-badge-status--delivered {
     background: rgba(52, 211, 153, 0.15);
     color: #6ee7b7;
 }
@@ -457,6 +473,11 @@
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(2, 6, 23, 0.35);
     border-color: rgba(148, 163, 184, 0.2);
+}
+
+.admin-stat-link:focus-visible .admin-stat-card {
+    outline: 2px solid rgba(56, 189, 248, 0.6);
+    outline-offset: 2px;
 }
 
 .admin-card {

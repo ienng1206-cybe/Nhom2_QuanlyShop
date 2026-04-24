@@ -179,9 +179,10 @@ class AdminController extends BaseController
         require_admin();
 
         $keyword = trim((string) ($_GET['keyword'] ?? ''));
+        $status = trim((string) ($_GET['status'] ?? ''));
         $orders = [];
         try {
-            $orders = (new OrderModel())->allForAdmin($keyword);
+            $orders = (new OrderModel())->allForAdmin($keyword, $status);
         } catch (Throwable $e) {
             $orders = [];
         }
@@ -190,6 +191,7 @@ class AdminController extends BaseController
             'title' => 'Đơn hàng',
             'orders' => $orders,
             'keyword' => $keyword,
+            'status' => $status,
         ]);
     }
 
@@ -200,6 +202,7 @@ class AdminController extends BaseController
         $id = (int) ($_POST['id'] ?? 0);
         $status = $_POST['status'] ?? 'pending';
         $keyword = trim((string) ($_POST['keyword'] ?? ''));
+        $filterStatus = trim((string) ($_POST['filter_status'] ?? ''));
         if ($id > 0) {
             $ok = (new OrderModel())->updateStatus($id, $status);
             $_SESSION[$ok ? 'success' : 'error'] = $ok ? 'Đã cập nhật trạng thái đơn hàng #' . $id . '.' : 'Không cập nhật được trạng thái.';
@@ -208,6 +211,9 @@ class AdminController extends BaseController
         $next = 'admin/orders';
         if ($keyword !== '') {
             $next .= '&keyword=' . urlencode($keyword);
+        }
+        if ($filterStatus !== '') {
+            $next .= '&status=' . urlencode($filterStatus);
         }
         redirect($next);
     }

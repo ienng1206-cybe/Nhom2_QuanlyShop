@@ -22,11 +22,11 @@ define('PATH_ASSETS_UPLOADS', PATH_ROOT . 'assets/uploads/');
 define('PATH_CONTROLLER', PATH_ROOT . 'controllers/');
 define('PATH_MODEL', PATH_ROOT . 'models/');
 
-// Laragon: thường root / mật khẩu trống / port 3306. Nếu lỗi kết nối, thử đổi DB_HOST thành '127.0.0.1' hoặc ngược lại.
+
 define('DB_HOST', 'localhost');
 define('DB_PORT', '3306');
 define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
+define('DB_PASSWORD', 'admin');
 define('DB_NAME', 'nhom2_quanlyshop');
 define('DB_CHARSET', 'utf8mb4');
 

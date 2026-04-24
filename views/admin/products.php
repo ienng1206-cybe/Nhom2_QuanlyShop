@@ -44,11 +44,7 @@
                             <input class="form-control" type="number" name="stock" min="0" placeholder="0">
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Link ảnh <span class="text-muted fw-normal"></span></label>
-                        <input class="form-control" type="text" name="image" placeholder="https://... ">
-                        <div class="form-text"></div>
-                    </div>
+                   
                     <div class="mb-3">
                         <label class="form-label">Tải ảnh sản phẩm</label>
                         <input class="form-control" type="file" name="image_file" accept="image/png,image/jpeg,image/webp,image/gif">
@@ -94,11 +90,7 @@
                                 <input class="form-control" type="number" name="stock" min="0" value="<?= htmlspecialchars((string) ($editingProduct['stock'] ?? 0)) ?>">
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Link ảnh</label>
-                            <input class="form-control" type="text" name="image" value="<?= htmlspecialchars((string) ($editingProduct['image'] ?? '')) ?>">
-                            <div class="form-text">Có thể nhập link mới hoặc tải ảnh mới từ máy. Giá trị hiện tại: <code><?= htmlspecialchars((string) ($editingProduct['image'] ?? '')) ?></code></div>
-                        </div>
+                    
                         <div class="mb-3">
                             <label class="form-label">Tải ảnh mới</label>
                             <input class="form-control" type="file" name="image_file" accept="image/png,image/jpeg,image/webp,image/gif">

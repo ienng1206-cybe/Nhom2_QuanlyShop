@@ -20,10 +20,21 @@
             <div class="col-md-5">
                 <input class="form-control" type="text" name="keyword" value="<?= htmlspecialchars((string) ($keyword ?? '')) ?>" placeholder="Tìm theo tên hoặc email người đặt">
             </div>
+            <div class="col-md-3">
+                <select class="form-select" name="status">
+                    <?php $statusFilter = (string) ($status ?? ''); ?>
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="pending" <?= $statusFilter === 'pending' ? 'selected' : '' ?>>Chờ xử lý</option>
+                    <option value="processing" <?= $statusFilter === 'processing' ? 'selected' : '' ?>>Đang xử lý</option>
+                    <option value="shipping" <?= $statusFilter === 'shipping' ? 'selected' : '' ?>>Đang giao</option>
+                    <option value="delivered" <?= $statusFilter === 'delivered' ? 'selected' : '' ?>>Đã giao</option>
+                    <option value="cancelled" <?= $statusFilter === 'cancelled' ? 'selected' : '' ?>>Đã hủy</option>
+                </select>
+            </div>
             <div class="col-auto">
                 <button class="btn btn-primary" type="submit">Tìm kiếm</button>
             </div>
-            <?php if (!empty($keyword)): ?>
+            <?php if (!empty($keyword) || !empty($statusFilter)): ?>
                 <div class="col-auto">
                     <a class="btn btn-outline-secondary" href="<?= BASE_URL ?>?action=admin/orders">Xóa lọc</a>
                 </div>
@@ -89,10 +100,12 @@
                                     <form method="post" action="<?= BASE_URL ?>?action=admin/order-status" class="d-flex flex-wrap gap-2 align-items-center">
                                         <input type="hidden" name="id" value="<?= (int) ($o['id'] ?? 0) ?>">
                                         <input type="hidden" name="keyword" value="<?= htmlspecialchars((string) ($keyword ?? '')) ?>">
+                                        <input type="hidden" name="filter_status" value="<?= htmlspecialchars((string) ($status ?? '')) ?>">
                                         <select name="status" class="form-select form-select-sm" style="min-width:9rem;">
                                             <option value="pending" <?= $rawSt === 'pending' ? 'selected' : '' ?>>Chờ xử lý</option>
                                             <option value="processing" <?= $rawSt === 'processing' ? 'selected' : '' ?>>Đang xử lý</option>
-                                            <option value="completed" <?= $rawSt === 'completed' ? 'selected' : '' ?>>Hoàn thành</option>
+                                            <option value="shipping" <?= $rawSt === 'shipping' ? 'selected' : '' ?>>Đang giao</option>
+                                            <option value="delivered" <?= in_array($rawSt, ['delivered', 'completed'], true) ? 'selected' : '' ?>>Đã giao</option>
                                             <option value="cancelled" <?= $rawSt === 'cancelled' ? 'selected' : '' ?>>Đã hủy</option>
                                         </select>
                                         <button class="btn btn-sm btn-primary" type="submit">Lưu</button>

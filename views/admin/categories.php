@@ -15,18 +15,14 @@
             <div class="admin-card h-100">
                 <div class="admin-card-header">
                     <h3 class="admin-card-title">Thêm danh mục</h3>
-                    <p class="admin-card-desc">Tên bắt buộc, mã (code) tùy chọn</p>
+                  
                 </div>
                 <form class="admin-form" method="post" action="<?= BASE_URL ?>?action=admin/categories">
                     <div class="mb-3">
                         <label class="form-label">Tên danh mục</label>
                         <input class="form-control" type="text" name="name" placeholder="Ví dụ: Giày chạy bộ" required maxlength="100">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Mã (code) <span class="text-muted fw-normal">(tùy chọn)</span></label>
-                        <input class="form-control" type="text" name="code" placeholder="vd: shoes" maxlength="50">
-                        <div class="form-text text-secondary">Dùng khi muốn URL/mã ngắn, tránh trùng.</div>
-                    </div>
+                 
                     <button class="btn btn-primary" type="submit">Thêm danh mục</button>
                 </form>
             </div>

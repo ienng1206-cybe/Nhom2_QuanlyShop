@@ -263,24 +263,41 @@ class OrderModel extends BaseModel
      * - user_name, user_email
      * - ship_phone, ship_address
      */
-    public function allForAdmin(string $keyword = ''): array
+    public function allForAdmin(string $keyword = '', string $status = ''): array
     {
         $amountCol = $this->ordersAmountColumn();
         $keyword = trim($keyword);
+        $status = trim($status);
         $hasKeyword = $keyword !== '';
+        $hasStatus = in_array($status, ['pending', 'processing', 'shipping', 'delivered', 'cancelled'], true);
         $like = '%' . $keyword . '%';
+        $statusWhere = $status === 'delivered' ? "o.status IN ('delivered', 'completed')" : 'o.status = :status';
 
         if (!$this->hasShippingTable()) {
             $sql = "SELECT o.*, o.{$amountCol} AS total_amount, u.name AS user_name, u.email AS user_email
                     FROM orders o
                     LEFT JOIN users u ON u.id = o.user_id";
+            $whereParts = [];
             if ($hasKeyword) {
-                $sql .= ' WHERE (u.name LIKE :kw OR u.email LIKE :kw)';
+                $whereParts[] = '(u.name LIKE :kw OR u.email LIKE :kw)';
+            }
+            if ($hasStatus) {
+                $whereParts[] = $statusWhere;
+            }
+            if (!empty($whereParts)) {
+                $sql .= ' WHERE ' . implode(' AND ', $whereParts);
             }
             $sql .= ' ORDER BY o.id DESC';
 
             $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($hasKeyword ? ['kw' => $like] : []);
+            $params = [];
+            if ($hasKeyword) {
+                $params['kw'] = $like;
+            }
+            if ($hasStatus && $status !== 'delivered') {
+                $params['status'] = $status;
+            }
+            $stmt->execute($params);
             return $stmt->fetchAll();
         }
 
@@ -300,23 +317,37 @@ class OrderModel extends BaseModel
                 ) sm ON sm.order_id = o.id
                 LEFT JOIN shipping s ON s.id = sm.max_id";
 
+        $whereParts = [];
         if ($hasKeyword) {
-            $whereParts = [
+            $keywordWhereParts = [
                 'u.name LIKE :kw',
                 'u.email LIKE :kw',
             ];
             if ($this->shippingHasRecipientNameColumn()) {
-                $whereParts[] = 's.recipient_name LIKE :kw';
+                $keywordWhereParts[] = 's.recipient_name LIKE :kw';
             }
             if ($this->shippingHasRecipientEmailColumn()) {
-                $whereParts[] = 's.recipient_email LIKE :kw';
+                $keywordWhereParts[] = 's.recipient_email LIKE :kw';
             }
-            $sql .= ' WHERE (' . implode(' OR ', $whereParts) . ')';
+            $whereParts[] = '(' . implode(' OR ', $keywordWhereParts) . ')';
+        }
+        if ($hasStatus) {
+            $whereParts[] = $statusWhere;
+        }
+        if (!empty($whereParts)) {
+            $sql .= ' WHERE ' . implode(' AND ', $whereParts);
         }
 
         $sql .= ' ORDER BY o.id DESC';
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($hasKeyword ? ['kw' => $like] : []);
+        $params = [];
+        if ($hasKeyword) {
+            $params['kw'] = $like;
+        }
+        if ($hasStatus && $status !== 'delivered') {
+            $params['status'] = $status;
+        }
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
@@ -431,9 +462,7 @@ class OrderModel extends BaseModel
         }
     }
 
-    /**
-     * Xóa đơn: hoàn lại tồn kho theo order_items rồi xóa đơn (CASCADE xóa chi tiết, shipping…).
-     */
+   
     public function delete($id): bool
     {
         $id = (int) $id;
